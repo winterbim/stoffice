@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="de" data-theme="light" data-lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Stoffice – Smart Building AI Kostenrechner für Facility Management Optimierung">
+    <title>Stoffice | Smart Building AI</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+
+    <!-- Fonts: DM Serif Display (display numbers) + Outfit (body) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <!-- Toast portal -->
+    <div class="toast-stack" id="toastContainer" aria-live="polite"></div>
+
+    <!-- Tooltip portal -->
+    <div class="tip" id="customTooltip" role="tooltip" aria-label="Information">.</div>
+
+    <!-- ═══ HEADER ═══ -->
+    <header class="header">
+        <div class="header-inner">
+            <a href="/" class="brand" aria-label="Stoffice Home">
+                <svg class="brand-icon" width="30" height="30" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+                    <rect width="32" height="32" rx="8" fill="currentColor" />
+                    <path d="M8 22V12l8-5 8 5v10l-8-4-8 4z" fill="#fff" fill-opacity=".92" />
+                </svg>
+                <span class="brand-name">Stoffice</span>
+            </a>
+
+            <div class="header-actions">
+                <div class="lang-toggle" id="langSwitcher">
+                    <button class="lang-btn active" data-lang-btn="de">DE</button>
+                    <button class="lang-btn" data-lang-btn="fr">FR</button>
+                </div>
+                <button class="icon-btn" id="darkModeToggle" aria-label="Theme wechseln">
+                    <i class="fa-solid fa-moon" id="darkModeIcon"></i>
+                </button>
+                <button class="icon-btn" id="exportPdf" aria-label="PDF exportieren">
+                    <i class="fa-solid fa-file-arrow-down"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ═══ MAIN ═══ -->
+    <main class="main">
+        <!-- Intro -->
+        <div class="intro">
+            <h1 data-i18n="title">Smart Building AI<br>Kostenrechner</h1>
+            <p class="intro-sub" data-i18n="subtitle">Berechnen Sie Einsparungen durch KI-gestützte
+                Gebäudeautomation</p>
+        </div>
+
+        <!-- Calculator Grid -->
+        <div class="calc">
+            <!-- ── INPUT ── -->
+            <section class="calc-input" aria-labelledby="inputHeading">
+                <h2 class="panel-title" id="inputHeading" data-i18n="inputVariables">Eingabevariablen</h2>
+
+                <form id="calculation-form" novalidate>
+                    <div class="field-row">
+                        <div class="field">
+                            <label for="daysPerYear" data-i18n="daysPerYear">Arbeitstage / Jahr</label>
+                            <div class="field-input">
+                                <input type="number" id="daysPerYear" value="250" min="1" max="365">
+                                <span class="field-unit" data-i18n="unitDays">T</span>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label for="incidentsPerDay" data-i18n="incidentsPerDay">Vorfälle / Tag</label>
+                            <div class="field-input">
+                                <input type="number" id="incidentsPerDay" value="30" min="0" max="500">
+                                <span class="field-unit">/d</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field-row">
+                        <div class="field">
+                            <label for="minutesPerIncident" data-i18n="minutesPerIncident">Minuten / Vorfall</label>
+                            <div class="field-input">
+                                <input type="number" id="minutesPerIncident" value="48" min="1" max="480">
+                                <span class="field-unit">min</span>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label for="hourlyRate" data-i18n="hourlyRate">Stundensatz (CHF)</label>
+                            <div class="field-input">
+                                <input type="number" id="hourlyRate" value="85" min="1" max="500">
+                                <span class="field-unit">CHF</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="sep"></div>
+
+                    <div class="field">
+                        <label for="costAI" data-i18n="costAI">Kosten der AI-Lösung (CHF / Jahr)</label>
+                        <div class="field-input">
+                            <input type="number" id="costAI" value="0" min="0" placeholder="0">
+                            <span class="field-unit">CHF/a</span>
+                        </div>
+                    </div>
+
+                    <div class="sep"></div>
+
+                    <h3 class="group-label" data-i18n="optimizationFactors">Optimierungsfaktoren</h3>
+
+                    <div class="toggles">
+                        <label class="toggle">
+                            <div class="toggle-text">
+                                <span class="toggle-name" data-i18n="digitalTwin">Digitaler Zwilling
+                                    vorhanden</span>
+                                <span class="toggle-pct">75 %</span>
+                            </div>
+                            <button type="button" class="toggle-info toggle-tooltip-trigger"
+                                data-tooltip-key="digitalTwinTip" aria-label="Info">
+                                <i class="fa-solid fa-circle-info"></i>
+                            </button>
+                            <input type="checkbox" id="optZwilling">
+                            <span class="toggle-track" aria-hidden="true"></span>
+                        </label>
+                        <label class="toggle">
+                            <div class="toggle-text">
+                                <span class="toggle-name" data-i18n="assetsLinked">Anlagen im digitalen
+                                    Zwilling</span>
+                                <span class="toggle-pct">10 %</span>
+                            </div>
+                            <button type="button" class="toggle-info toggle-tooltip-trigger"
+                                data-tooltip-key="assetsLinkedTip" aria-label="Info">
+                                <i class="fa-solid fa-circle-info"></i>
+                            </button>
+                            <input type="checkbox" id="optAssets">
+                            <span class="toggle-track" aria-hidden="true"></span>
+                        </label>
+                        <label class="toggle">
+                            <div class="toggle-text">
+                                <span class="toggle-name" data-i18n="docUpToDate">Dokumentation immer aktuell</span>
+                                <span class="toggle-pct">5 %</span>
+                            </div>
+                            <button type="button" class="toggle-info toggle-tooltip-trigger"
+                                data-tooltip-key="docUpToDateTip" aria-label="Info">
+                                <i class="fa-solid fa-circle-info"></i>
+                            </button>
+                            <input type="checkbox" id="optDoku">
+                            <span class="toggle-track" aria-hidden="true"></span>
+                        </label>
+                        <label class="toggle">
+                            <div class="toggle-text">
+                                <span class="toggle-name" data-i18n="autoOrders">Automatisierte
+                                    Auftragserstellung</span>
+                                <span class="toggle-pct">10 %</span>
+                            </div>
+                            <button type="button" class="toggle-info toggle-tooltip-trigger"
+                                data-tooltip-key="autoOrdersTip" aria-label="Info">
+                                <i class="fa-solid fa-circle-info"></i>
+                            </button>
+                            <input type="checkbox" id="optAuto">
+                            <span class="toggle-track" aria-hidden="true"></span>
+                        </label>
+                    </div>
+
+                    <div class="meter" id="savingsBarContainer">
+                        <div class="meter-head">
+                            <span data-i18n="totalOptimization">Gesamtoptimierung</span>
+                            <strong id="savingsBarPercent">0 %</strong>
+                        </div>
+                        <div class="meter-track">
+                            <div class="meter-fill" id="savingsBarFill"></div>
+                        </div>
+                    </div>
+
+                    <div class="actions">
+                        <button type="button" class="btn btn--ghost" id="resetBtn">
+                            <span data-i18n="reset">Zurücksetzen</span>
+                        </button>
+                        <button type="submit" class="btn btn--solid">
+                            <span data-i18n="calculate">Berechnen</span>
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- ── OUTPUT ── -->
+            <section class="calc-output" id="resultSection" aria-labelledby="resultsHeading">
+                <h2 class="panel-title" id="resultsHeading" data-i18n="results">Ergebnisse</h2>
+
+                <!-- Placeholder -->
+                <div class="empty" id="resultsPlaceholder">
+                    <i class="fa-solid fa-chart-pie empty-icon"></i>
+                    <p class="empty-title" data-i18n="placeholderTitle">Aktivieren Sie Optimierungen</p>
+                    <p class="empty-sub" data-i18n="placeholderSub">Die Ergebnisse werden in Echtzeit berechnet</p>
+                </div>
+
+                <!-- Results -->
+                <div id="results-content" class="hidden">
+                    <div id="heroMetric"></div>
+                    <div class="data-strip" id="metricsRow"></div>
+                    <div class="charts-area">
+                        <div class="chart-block">
+                            <canvas id="barChart"></canvas>
+                        </div>
+                        <div class="chart-block chart-block--sm">
+                            <canvas id="donutChart"></canvas>
+                        </div>
+                    </div>
+                    <div id="detailedResults"></div>
+                    <div id="roiSection"></div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- ═══ FOOTER ═══ -->
+    <footer class="footer">
+        <p><strong data-i18n="copyright">© 2025–2026 Stoffice / Simone J. Stocker – MAS Real Estate</strong></p>
+        <p data-i18n="disclaimer">Alle Angaben ohne Gewähr. Werte dienen zur Veranschaulichung & Testzwecken.</p>
+        <p class="footer-version" data-i18n="sidebarVersion">v5.0 – CAS These HWZ 2026</p>
+    </footer>
+
+    <script src="js/app.js"></script>
+</body>
+
+</html>
