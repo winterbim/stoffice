@@ -981,7 +981,7 @@
             url = D.buildUrl.value.trim();
             statusEl = D.buildStatus;
             resultEl = D.buildResult;
-            endpoint = '5.1/projects';
+            endpoint = '5.0/projects';
         }
 
         if (!key) {

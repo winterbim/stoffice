@@ -33,6 +33,7 @@ module.exports = async function handler(req, res) {
     // Validate baseUrl — only allow known Dalux domains
     const allowedDomains = [
         'field.dalux.com',
+        'node2.field.dalux.com',
         'fm-api.dalux.com',
         'fm-stage-api.dalux.com',
         'fm.dalux.com',
