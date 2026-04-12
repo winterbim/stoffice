@@ -1,0 +1,5 @@
+{
+  "rewrites": [
+    { "source": "/api/dalux/proxy", "destination": "/api/dalux/proxy" }
+  ]
+}

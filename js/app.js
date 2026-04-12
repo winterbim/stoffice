@@ -926,8 +926,25 @@
     }
 
     /* ═══════════════════════════════════
-       DALUX API CONNECTION
+       DALUX API CONNECTION (via Vercel proxy)
        ═══════════════════════════════════ */
+    var PROXY_URL = '/api/dalux/proxy';
+
+    function daluxFetch(apiKey, baseUrl, endpoint) {
+        return fetch(PROXY_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ apiKey: apiKey, baseUrl: baseUrl, endpoint: endpoint })
+        }).then(function (r) {
+            if (!r.ok) {
+                return r.json().then(function (err) {
+                    throw new Error(err.error || 'HTTP ' + r.status);
+                });
+            }
+            return r.json();
+        });
+    }
+
     function saveDaluxConfig() {
         var config = {
             fmKey: D.fmKey.value,
@@ -958,13 +975,13 @@
             url = D.fmUrl.value.trim();
             statusEl = D.fmStatus;
             resultEl = D.fmResult;
-            endpoint = '/2.0/buildings';
+            endpoint = '2.0/buildings';
         } else {
             key = D.buildKey.value.trim();
             url = D.buildUrl.value.trim();
             statusEl = D.buildStatus;
             resultEl = D.buildResult;
-            endpoint = '/5.1/projects';
+            endpoint = '5.1/projects';
         }
 
         if (!key) {
@@ -972,60 +989,50 @@
             return;
         }
 
-        // Update status to connecting
         statusEl.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>' + t('connecting') + '</span>';
         statusEl.className = 'dalux-status';
-
         saveDaluxConfig();
 
-        // Test the connection
-        fetch(url + endpoint, {
-            method: 'GET',
-            headers: {
-                'X-API-KEY': key,
-                'Accept': 'application/json'
-            }
-        })
-        .then(function (response) {
-            if (response.ok) {
-                return response.json().then(function (data) {
-                    statusEl.innerHTML = '<i class="fa-solid fa-circle"></i> <span>' + t('connected') + '</span>';
-                    statusEl.className = 'dalux-status connected';
+        daluxFetch(key, url, endpoint)
+            .then(function (data) {
+                statusEl.innerHTML = '<i class="fa-solid fa-circle"></i> <span>' + t('connected') + '</span>';
+                statusEl.className = 'dalux-status connected';
 
-                    var count = 0;
-                    if (data && Array.isArray(data)) count = data.length;
-                    else if (data && data.items) count = data.items.length;
-                    else if (data && data.data) count = data.data.length;
+                var count = extractCount(data);
 
-                    var msg = type === 'fm'
-                        ? (currentLang === 'fr' ? 'Connecté ! ' + count + ' bâtiment(s) trouvé(s).' : 'Verbunden! ' + count + ' Gebäude gefunden.')
-                        : (currentLang === 'fr' ? 'Connecté ! ' + count + ' projet(s) trouvé(s).' : 'Verbunden! ' + count + ' Projekt(e) gefunden.');
+                var msg = type === 'fm'
+                    ? (currentLang === 'fr' ? 'Connecté ! ' + count + ' bâtiment(s) trouvé(s).' : 'Verbunden! ' + count + ' Gebäude gefunden.')
+                    : (currentLang === 'fr' ? 'Connecté ! ' + count + ' projet(s) trouvé(s).' : 'Verbunden! ' + count + ' Projekt(e) gefunden.');
 
-                    showDaluxResult(resultEl, 'success', msg);
-                    toast(msg);
+                showDaluxResult(resultEl, 'success', msg);
+                toast(msg);
 
-                    if (type === 'fm') {
-                        loadDaluxFmData(key, url);
-                    }
-                });
-            } else if (response.status === 401 || response.status === 403) {
-                throw new Error(currentLang === 'fr' ? 'Clé API invalide ou expirée (HTTP ' + response.status + ')' : 'Ungültiger oder abgelaufener API-Schlüssel (HTTP ' + response.status + ')');
-            } else {
-                throw new Error('HTTP ' + response.status + ' — ' + response.statusText);
-            }
-        })
-        .catch(function (err) {
-            statusEl.innerHTML = '<i class="fa-solid fa-circle"></i> <span>' + t('disconnected') + '</span>';
-            statusEl.className = 'dalux-status';
+                if (type === 'fm') {
+                    loadDaluxFmData(key, url);
+                }
+                if (type === 'build') {
+                    loadDaluxBuildData(key, url, data);
+                }
+            })
+            .catch(function (err) {
+                statusEl.innerHTML = '<i class="fa-solid fa-circle"></i> <span>' + t('disconnected') + '</span>';
+                statusEl.className = 'dalux-status';
 
-            var errMsg = err.message;
-            if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
-                errMsg = currentLang === 'fr'
-                    ? 'Erreur réseau — vérifiez l\'URL et CORS. L\'API Dalux peut nécessiter un proxy backend.'
-                    : 'Netzwerkfehler — Überprüfen Sie die URL und CORS. Die Dalux-API benötigt möglicherweise einen Backend-Proxy.';
-            }
-            showDaluxResult(resultEl, 'error', errMsg);
-        });
+                var errMsg = err.message;
+                if (errMsg.includes('Failed to fetch') || errMsg.includes('NetworkError')) {
+                    errMsg = currentLang === 'fr'
+                        ? 'Erreur réseau — le proxy serverless est peut-être indisponible.'
+                        : 'Netzwerkfehler — der Serverless-Proxy ist möglicherweise nicht verfügbar.';
+                }
+                showDaluxResult(resultEl, 'error', errMsg);
+            });
+    }
+
+    function extractCount(data) {
+        if (Array.isArray(data)) return data.length;
+        if (data && data.items) return data.items.length;
+        if (data && data.data) return data.data.length;
+        return 0;
     }
 
     function showDaluxResult(el, type, msg) {
@@ -1039,52 +1046,67 @@
         D.daluxDataSection.classList.remove('hidden');
         D.daluxDataGrid.innerHTML = '<div class="dalux-stat-card"><p style="color:var(--text-2)"><i class="fa-solid fa-spinner fa-spin"></i> ' + (currentLang === 'fr' ? 'Chargement des données…' : 'Daten werden geladen…') + '</p></div>';
 
-        var stats = {
-            buildings: 0,
-            assets: 0,
-            workorders: 0,
-            tickets: 0,
-        };
+        var stats = { buildings: 0, assets: 0, workorders: 0, tickets: 0 };
 
-        // Fetch buildings
-        var fetchBuildings = fetch(url + '/2.0/buildings', { headers: { 'X-API-KEY': key, 'Accept': 'application/json' } })
-            .then(function (r) { return r.json(); })
-            .then(function (d) {
-                var items = d.items || d.data || (Array.isArray(d) ? d : []);
-                stats.buildings = items.length;
-            })
+        var fetchBuildings = daluxFetch(key, url, '2.0/buildings')
+            .then(function (d) { stats.buildings = extractCount(d); })
             .catch(function () { stats.buildings = '—'; });
 
-        // Fetch work orders
-        var fetchWO = fetch(url + '/2.2/workorders', { headers: { 'X-API-KEY': key, 'Accept': 'application/json' } })
-            .then(function (r) { return r.json(); })
-            .then(function (d) {
-                var items = d.items || d.data || (Array.isArray(d) ? d : []);
-                stats.workorders = items.length;
-            })
+        var fetchWO = daluxFetch(key, url, '2.2/workorders')
+            .then(function (d) { stats.workorders = extractCount(d); })
             .catch(function () { stats.workorders = '—'; });
 
-        // Fetch assets
-        var fetchAssets = fetch(url + '/2.0/assets', { headers: { 'X-API-KEY': key, 'Accept': 'application/json' } })
-            .then(function (r) { return r.json(); })
-            .then(function (d) {
-                var items = d.items || d.data || (Array.isArray(d) ? d : []);
-                stats.assets = items.length;
-            })
+        var fetchAssets = daluxFetch(key, url, '2.0/assets')
+            .then(function (d) { stats.assets = extractCount(d); })
             .catch(function () { stats.assets = '—'; });
 
-        // Fetch tickets
-        var fetchTickets = fetch(url + '/2.0/tickets', { headers: { 'X-API-KEY': key, 'Accept': 'application/json' } })
-            .then(function (r) { return r.json(); })
-            .then(function (d) {
-                var items = d.items || d.data || (Array.isArray(d) ? d : []);
-                stats.tickets = items.length;
-            })
+        var fetchTickets = daluxFetch(key, url, '2.0/tickets')
+            .then(function (d) { stats.tickets = extractCount(d); })
             .catch(function () { stats.tickets = '—'; });
 
         Promise.all([fetchBuildings, fetchWO, fetchAssets, fetchTickets]).then(function () {
             renderDaluxData(stats);
         });
+    }
+
+    /* ═══════ LOAD DALUX BUILD DATA ═══════ */
+    function loadDaluxBuildData(key, url, projectsData) {
+        D.daluxDataSection.classList.remove('hidden');
+
+        var projects = [];
+        if (Array.isArray(projectsData)) projects = projectsData;
+        else if (projectsData && projectsData.items) projects = projectsData.items;
+        else if (projectsData && projectsData.data) projects = projectsData.data;
+
+        var stats = {
+            projects: projects.length,
+            tasks: 0,
+            forms: 0,
+            companies: 0,
+        };
+
+        // If we have projects, fetch details from the first one
+        if (projects.length > 0) {
+            var pid = projects[0].projectId || projects[0].id || projects[0].Id;
+
+            var fetchTasks = pid ? daluxFetch(key, url, '5.2/projects/' + pid + '/tasks')
+                .then(function (d) { stats.tasks = extractCount(d); })
+                .catch(function () { stats.tasks = '—'; }) : Promise.resolve();
+
+            var fetchForms = pid ? daluxFetch(key, url, '2.2/projects/' + pid + '/forms')
+                .then(function (d) { stats.forms = extractCount(d); })
+                .catch(function () { stats.forms = '—'; }) : Promise.resolve();
+
+            var fetchCompanies = pid ? daluxFetch(key, url, '3.1/projects/' + pid + '/companies')
+                .then(function (d) { stats.companies = extractCount(d); })
+                .catch(function () { stats.companies = '—'; }) : Promise.resolve();
+
+            Promise.all([fetchTasks, fetchForms, fetchCompanies]).then(function () {
+                renderBuildData(stats, projects);
+            });
+        } else {
+            renderBuildData(stats, []);
+        }
     }
 
     function renderDaluxData(stats) {
@@ -1134,6 +1156,80 @@
                 '<div class="dalux-stat-sub">' + c.sub + '</div>' +
             '</div>';
         });
+
+        D.daluxDataGrid.innerHTML = html;
+    }
+
+    function renderBuildData(stats, projects) {
+        var cards = [
+            {
+                icon: 'fa-helmet-safety',
+                color: '--info',
+                bg: 'rgba(96,165,250,0.1)',
+                value: stats.projects,
+                label: currentLang === 'fr' ? 'Projets' : 'Projekte',
+                sub: 'DALUX BUILD'
+            },
+            {
+                icon: 'fa-list-check',
+                color: '--accent',
+                bg: 'rgba(0,200,170,0.1)',
+                value: stats.tasks,
+                label: currentLang === 'fr' ? 'Tâches Field' : 'Field-Aufgaben',
+                sub: 'TASKS'
+            },
+            {
+                icon: 'fa-file-lines',
+                color: '--plum',
+                bg: 'rgba(168,122,212,0.1)',
+                value: stats.forms,
+                label: currentLang === 'fr' ? 'Formulaires' : 'Formulare',
+                sub: 'FORMS'
+            },
+            {
+                icon: 'fa-building-user',
+                color: '--gold',
+                bg: 'rgba(212,168,67,0.1)',
+                value: stats.companies,
+                label: currentLang === 'fr' ? 'Mandataires' : 'Mandanten',
+                sub: 'COMPANIES'
+            }
+        ];
+
+        var html = '';
+        cards.forEach(function (c) {
+            html += '<div class="dalux-stat-card">' +
+                '<div class="dalux-stat-icon" style="background:' + c.bg + ';color:var(' + c.color + ')">' +
+                    '<i class="fa-solid ' + c.icon + '"></i>' +
+                '</div>' +
+                '<div class="dalux-stat-value">' + c.value + '</div>' +
+                '<div class="dalux-stat-label">' + c.label + '</div>' +
+                '<div class="dalux-stat-sub">' + c.sub + '</div>' +
+            '</div>';
+        });
+
+        // Project list
+        if (projects.length > 0) {
+            html += '<div class="dalux-stat-card" style="grid-column: 1 / -1">' +
+                '<div class="dalux-stat-icon" style="background:rgba(0,200,170,0.1);color:var(--accent)">' +
+                    '<i class="fa-solid fa-folder-open"></i>' +
+                '</div>' +
+                '<div class="dalux-stat-label" style="margin-bottom:8px">' + (currentLang === 'fr' ? 'Projets disponibles' : 'Verfügbare Projekte') + '</div>';
+
+            projects.slice(0, 10).forEach(function (p) {
+                var name = p.name || p.Name || p.projectName || '—';
+                var id = p.projectId || p.id || p.Id || '';
+                html += '<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--glass-border);font-size:1.3rem">' +
+                    '<span style="color:var(--text-1)">' + name + '</span>' +
+                    '<span style="font-family:var(--mono);font-size:1.1rem;color:var(--text-3)">' + id + '</span>' +
+                '</div>';
+            });
+
+            if (projects.length > 10) {
+                html += '<div style="padding-top:8px;font-size:1.2rem;color:var(--text-3)">+ ' + (projects.length - 10) + (currentLang === 'fr' ? ' autres projets…' : ' weitere Projekte…') + '</div>';
+            }
+            html += '</div>';
+        }
 
         D.daluxDataGrid.innerHTML = html;
     }
