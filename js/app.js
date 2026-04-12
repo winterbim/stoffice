@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════
-   STOFFICE v5.0 — Logic + i18n (DE/FR)
+   STOFFICE v6.0 — Logic + i18n + Dalux API + Sankey
    Smart Building AI Calculator
    ═══════════════════════════════════════════════════════ */
 
@@ -9,7 +9,7 @@
     /* ═══════ i18n DICTIONARIES ═══════ */
     const I18N = {
         de: {
-            title: 'Smart Building AI\nKostenrechner',
+            title: 'Smart Building <em>AI</em>',
             subtitle: 'Berechnen Sie Einsparungen durch KI-gestützte Gebäudeautomation',
             inputVariables: 'Eingabevariablen',
             daysPerYear: 'Arbeitstage / Jahr',
@@ -65,9 +65,27 @@
             months: 'Monate',
             years: 'Jahre',
 
+            // Dalux
+            daluxTitle: 'Dalux API Verbindung',
+            daluxFmSub: 'Facility Management API',
+            daluxBuildSub: 'Field / Handover API',
+            apiKey: 'API-Schlüssel (X-API-KEY)',
+            baseUrl: 'Base URL',
+            testConnection: 'Verbindung testen',
+            disconnected: 'Getrennt',
+            connected: 'Verbunden',
+            connecting: 'Verbinde…',
+            daluxHint: 'Ihre API-Schlüssel werden nur lokal in Ihrem Browser gespeichert und niemals an unsere Server übertragen.',
+            daluxDataTitle: 'Dalux Live-Daten',
+
+            // Sankey
+            sankeyTitle: 'Handover-Analyse — Kritische Pfade',
+            sankeyDesc: 'Diagramm der Datenflüsse vom Handover zur Wartung. Identifiziert Engpässe und Blockierpunkte.',
+
+            // Footer
             copyright: '© 2025–2026 Stoffice / Simone J. Stocker – MAS Real Estate',
             disclaimer: 'Alle Angaben ohne Gewähr. Werte dienen zur Veranschaulichung & Testzwecken.',
-            sidebarVersion: 'v5.0 – CAS These HWZ 2026',
+            sidebarVersion: 'v6.0 – CAS These HWZ 2026',
             toastReset: 'Formular zurückgesetzt',
             toastExport: 'Druckvorschau wird geöffnet…',
             toastLangDE: 'Sprache: Deutsch',
@@ -77,7 +95,7 @@
         },
 
         fr: {
-            title: 'Calculateur Smart Building\nIA',
+            title: 'Smart Building <em>IA</em>',
             subtitle: 'Calculez les économies grâce à l\'automatisation intelligente des bâtiments',
             inputVariables: 'Variables d\'entrée',
             daysPerYear: 'Jours ouvrables / an',
@@ -133,9 +151,26 @@
             months: 'mois',
             years: 'ans',
 
+            // Dalux
+            daluxTitle: 'Connexion API Dalux',
+            daluxFmSub: 'API Facility Management',
+            daluxBuildSub: 'API Field / Handover',
+            apiKey: 'Clé API (X-API-KEY)',
+            baseUrl: 'URL de base',
+            testConnection: 'Tester la connexion',
+            disconnected: 'Déconnecté',
+            connected: 'Connecté',
+            connecting: 'Connexion…',
+            daluxHint: 'Vos clés API sont stockées uniquement dans votre navigateur et ne sont jamais transmises à nos serveurs.',
+            daluxDataTitle: 'Données Dalux en direct',
+
+            // Sankey
+            sankeyTitle: 'Analyse Handover — Chemins critiques',
+            sankeyDesc: 'Diagramme des flux de données du handover à la maintenance. Identifie les goulots d\'étranglement et points bloquants.',
+
             copyright: '© 2025–2026 Stoffice / Simone J. Stocker – MAS Real Estate',
             disclaimer: 'Sans garantie. Les valeurs servent uniquement à des fins d\'illustration et de test.',
-            sidebarVersion: 'v5.0 – CAS Thèse HWZ 2026',
+            sidebarVersion: 'v6.0 – CAS Thèse HWZ 2026',
             toastReset: 'Formulaire réinitialisé',
             toastExport: 'Aperçu d\'impression en cours…',
             toastLangDE: 'Sprache: Deutsch',
@@ -152,10 +187,10 @@
 
     /* ═══════ OPTIMIZATION MAP ═══════ */
     const OPT = {
-        optZwilling: { pct: 0.75, key: 'digitalTwinFactor', color: '#1a6b5a' },
-        optAssets:   { pct: 0.10, key: 'assetsLinkedFactor', color: '#2d8f7b' },
-        optDoku:     { pct: 0.05, key: 'docFactor',          color: '#6d28d9' },
-        optAuto:     { pct: 0.10, key: 'autoFactor',         color: '#b8860b' },
+        optZwilling: { pct: 0.75, key: 'digitalTwinFactor', color: '#00c8aa' },
+        optAssets:   { pct: 0.10, key: 'assetsLinkedFactor', color: '#60a5fa' },
+        optDoku:     { pct: 0.05, key: 'docFactor',          color: '#a87ad4' },
+        optAuto:     { pct: 0.10, key: 'autoFactor',         color: '#d4a843' },
     };
 
     const DEFAULTS = {
@@ -165,28 +200,52 @@
     };
 
     /* ═══════ DOM ═══════ */
-    const $ = s => document.querySelector(s);
-    const $$ = s => document.querySelectorAll(s);
+    const $ = function (s) { return document.querySelector(s); };
+    const $$ = function (s) { return document.querySelectorAll(s); };
     const D = {};
 
     function cacheDom() {
-        D.form       = $('#calculation-form');
-        D.content    = $('#results-content');
-        D.placeholder= $('#resultsPlaceholder');
-        D.hero       = $('#heroMetric');
-        D.metrics    = $('#metricsRow');
-        D.detailed   = $('#detailedResults');
-        D.roi        = $('#roiSection');
-        D.resetBtn   = $('#resetBtn');
-        D.darkToggle = $('#darkModeToggle');
-        D.darkIcon   = $('#darkModeIcon');
-        D.exportBtn  = $('#exportPdf');
-        D.meter      = $('#savingsBarContainer');
-        D.meterFill  = $('#savingsBarFill');
-        D.meterPct   = $('#savingsBarPercent');
-        D.toasts     = $('#toastContainer');
-        D.tooltip    = $('#customTooltip');
-        D.langBtns   = $$('[data-lang-btn]');
+        D.form        = $('#calculation-form');
+        D.content     = $('#results-content');
+        D.placeholder = $('#resultsPlaceholder');
+        D.hero        = $('#heroMetric');
+        D.metrics     = $('#metricsRow');
+        D.detailed    = $('#detailedResults');
+        D.roi         = $('#roiSection');
+        D.resetBtn    = $('#resetBtn');
+        D.darkToggle  = $('#darkModeToggle');
+        D.darkIcon    = $('#darkModeIcon');
+        D.exportBtn   = $('#exportPdf');
+        D.meter       = $('#savingsBarContainer');
+        D.meterFill   = $('#savingsBarFill');
+        D.meterPct    = $('#savingsBarPercent');
+        D.toasts      = $('#toastContainer');
+        D.tooltip     = $('#customTooltip');
+        D.langBtns    = $$('[data-lang-btn]');
+        D.toggleRows  = $$('.toggle-row');
+        // Dalux
+        D.daluxToggle = $('#daluxConfigToggle');
+        D.daluxPanel  = $('#daluxPanel');
+        D.daluxClose  = $('#daluxPanelClose');
+        D.fmKey       = $('#daluxFmKey');
+        D.fmUrl       = $('#daluxFmUrl');
+        D.buildKey    = $('#daluxBuildKey');
+        D.buildUrl    = $('#daluxBuildUrl');
+        D.fmStatus    = $('#fmStatus');
+        D.buildStatus = $('#buildStatus');
+        D.fmResult    = $('#fmResult');
+        D.buildResult = $('#buildResult');
+        D.testFm      = $('#testFmConnection');
+        D.testBuild   = $('#testBuildConnection');
+        D.toggleFmVis = $('#toggleFmKeyVis');
+        D.toggleBuildVis = $('#toggleBuildKeyVis');
+        // Sankey
+        D.sankeySection = $('#sankeySection');
+        D.sankeyChart   = $('#sankeyChart');
+        D.sankeyLegend  = $('#sankeyLegend');
+        // Dalux data
+        D.daluxDataSection = $('#daluxDataSection');
+        D.daluxDataGrid    = $('#daluxDataGrid');
     }
 
     /* ═══════ INIT ═══════ */
@@ -195,6 +254,7 @@
         loadTheme();
         loadLang();
         loadFormState();
+        loadDaluxConfig();
         bindEvents();
         calc();
     }
@@ -203,11 +263,11 @@
     function t(k) { return I18N[currentLang]?.[k] ?? I18N.de[k] ?? k; }
 
     function applyI18n() {
-        $$('[data-i18n]').forEach(el => {
-            const key = el.dataset.i18n;
-            const txt = t(key);
+        $$('[data-i18n]').forEach(function (el) {
+            var key = el.dataset.i18n;
+            var txt = t(key);
             if (key === 'title') {
-                el.innerHTML = txt.replace('\n', '<br>');
+                el.innerHTML = txt;
             } else {
                 el.textContent = txt;
             }
@@ -220,21 +280,21 @@
         currentLang = lang;
         document.documentElement.dataset.lang = lang;
         localStorage.setItem('stoffice-lang', lang);
-        D.langBtns.forEach(b => b.classList.toggle('active', b.dataset.langBtn === lang));
+        D.langBtns.forEach(function (b) { b.classList.toggle('active', b.dataset.langBtn === lang); });
         applyI18n();
         calc();
     }
 
     function loadLang() {
-        const s = localStorage.getItem('stoffice-lang');
+        var s = localStorage.getItem('stoffice-lang');
         if (s && I18N[s]) currentLang = s;
         setLang(currentLang);
     }
 
     /* ═══════ DARK MODE ═══════ */
     function toggleTheme() {
-        const isDark = document.documentElement.dataset.theme === 'dark';
-        const next = isDark ? 'light' : 'dark';
+        var isDark = document.documentElement.dataset.theme === 'dark';
+        var next = isDark ? 'light' : 'dark';
         document.documentElement.dataset.theme = next;
         D.darkIcon.className = isDark ? 'fa-solid fa-moon' : 'fa-solid fa-sun';
         localStorage.setItem('stoffice-theme', next);
@@ -243,30 +303,29 @@
     }
 
     function loadTheme() {
-        const s = localStorage.getItem('stoffice-theme');
-        if (s) {
-            document.documentElement.dataset.theme = s;
-            D.darkIcon.className = s === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
-        }
+        var s = localStorage.getItem('stoffice-theme');
+        if (!s) s = 'dark'; // default dark
+        document.documentElement.dataset.theme = s;
+        D.darkIcon.className = s === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
     }
 
     /* ═══════ TOAST ═══════ */
     function toast(msg) {
-        const el = document.createElement('div');
+        var el = document.createElement('div');
         el.className = 'toast';
-        el.innerHTML = `<i class="fa-solid fa-circle-check"></i> ${msg}`;
+        el.innerHTML = '<i class="fa-solid fa-circle-check"></i> ' + msg;
         D.toasts.appendChild(el);
-        setTimeout(() => { el.classList.add('toast-exit'); setTimeout(() => el.remove(), 250); }, 2200);
+        setTimeout(function () { el.classList.add('toast-exit'); setTimeout(function () { el.remove(); }, 250); }, 2200);
     }
 
     /* ═══════ TOOLTIP ═══════ */
     function showTip(trigger, text) {
         D.tooltip.textContent = text;
         D.tooltip.classList.add('visible');
-        const r = trigger.getBoundingClientRect();
-        const tt = D.tooltip.getBoundingClientRect();
-        let left = r.left + r.width / 2 - tt.width / 2;
-        let top = r.bottom + 8;
+        var r = trigger.getBoundingClientRect();
+        var tt = D.tooltip.getBoundingClientRect();
+        var left = r.left + r.width / 2 - tt.width / 2;
+        var top = r.bottom + 8;
         if (left < 8) left = 8;
         if (left + tt.width > innerWidth - 8) left = innerWidth - tt.width - 8;
         if (top + tt.height > innerHeight - 8) top = r.top - tt.height - 8;
@@ -295,26 +354,34 @@
 
     function loadFormState() {
         try {
-            const s = localStorage.getItem('stoffice-form');
+            var s = localStorage.getItem('stoffice-form');
             if (!s) return;
-            const d = JSON.parse(s);
-            ['daysPerYear','incidentsPerDay','minutesPerIncident','hourlyRate','costAI'].forEach(k => {
-                const el = document.getElementById(k);
+            var d = JSON.parse(s);
+            ['daysPerYear','incidentsPerDay','minutesPerIncident','hourlyRate','costAI'].forEach(function (k) {
+                var el = document.getElementById(k);
                 if (el && d[k] !== undefined) el.value = d[k];
             });
-            ['optZwilling','optAssets','optDoku','optAuto'].forEach(k => {
-                const el = document.getElementById(k);
+            ['optZwilling','optAssets','optDoku','optAuto'].forEach(function (k) {
+                var el = document.getElementById(k);
                 if (el && d[k] !== undefined) el.checked = d[k];
+            });
+            // Sync toggle row active states
+            D.toggleRows.forEach(function (row) {
+                var id = row.dataset.toggle;
+                var cb = document.getElementById(id);
+                if (cb) row.classList.toggle('active', cb.checked);
             });
         } catch (e) { /* ignore */ }
     }
 
     function resetForm() {
-        Object.entries(DEFAULTS).forEach(([k, v]) => {
-            const el = document.getElementById(k);
+        Object.entries(DEFAULTS).forEach(function (entry) {
+            var k = entry[0], v = entry[1];
+            var el = document.getElementById(k);
             if (!el) return;
             if (typeof v === 'boolean') el.checked = v; else el.value = v;
         });
+        D.toggleRows.forEach(function (row) { row.classList.remove('active'); });
         localStorage.removeItem('stoffice-form');
         calc();
         toast(t('toastReset'));
@@ -326,14 +393,14 @@
     }
     function fmtN(n) { return new Intl.NumberFormat('de-CH').format(Math.round(n)); }
 
-    /* ═══════ COUNTER ═══════ */
+    /* ═══════ COUNTER ANIMATION ═══════ */
     function countUp(el, target, formatter) {
         if (!el) return;
-        const dur = 600;
-        const t0 = performance.now();
+        var dur = 600;
+        var t0 = performance.now();
         (function tick(now) {
-            const p = Math.min((now - t0) / dur, 1);
-            const ease = 1 - Math.pow(1 - p, 4);
+            var p = Math.min((now - t0) / dur, 1);
+            var ease = 1 - Math.pow(1 - p, 4);
             el.textContent = formatter(Math.round(target * ease));
             if (p < 1) requestAnimationFrame(tick);
             else el.textContent = formatter(target);
@@ -342,80 +409,130 @@
 
     /* ═══════ DEBOUNCE ═══════ */
     function debounce(fn, ms) {
-        let timer;
+        var timer;
         return function () { clearTimeout(timer); timer = setTimeout(fn, ms); };
     }
 
     /* ═══════ EVENTS ═══════ */
     function bindEvents() {
-        const auto = debounce(() => { saveForm(); calc(); }, 100);
+        var auto = debounce(function () { saveForm(); calc(); }, 100);
 
-        D.form.querySelectorAll('input').forEach(inp => {
+        // Form inputs
+        D.form.querySelectorAll('input[type="number"]').forEach(function (inp) {
             inp.addEventListener('input', auto);
-            inp.addEventListener('change', () => { saveForm(); calc(); });
+            inp.addEventListener('change', function () { saveForm(); calc(); });
         });
 
-        D.form.addEventListener('submit', e => { e.preventDefault(); calc(); });
+        D.form.addEventListener('submit', function (e) { e.preventDefault(); calc(); });
         D.resetBtn.addEventListener('click', resetForm);
         D.darkToggle.addEventListener('click', toggleTheme);
 
-        D.exportBtn.addEventListener('click', () => {
+        D.exportBtn.addEventListener('click', function () {
             toast(t('toastExport'));
-            setTimeout(() => print(), 350);
+            setTimeout(function () { print(); }, 350);
         });
 
         // Language
-        D.langBtns.forEach(btn => btn.addEventListener('click', () => {
-            const lang = btn.dataset.langBtn;
-            if (lang !== currentLang) {
-                setLang(lang);
-                toast(lang === 'fr' ? t('toastLangFR') : t('toastLangDE'));
-            }
-        }));
-
-        // Tooltips
-        $$('.toggle-tooltip-trigger').forEach(tr => {
-            const key = tr.dataset.tooltipKey;
-            tr.addEventListener('mouseenter', e => { e.stopPropagation(); showTip(tr, t(key)); });
-            tr.addEventListener('mouseleave', hideTip);
-            tr.addEventListener('focus', () => showTip(tr, t(key)));
-            tr.addEventListener('blur', hideTip);
-            tr.addEventListener('click', e => e.preventDefault());
+        D.langBtns.forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var lang = btn.dataset.langBtn;
+                if (lang !== currentLang) {
+                    setLang(lang);
+                    toast(lang === 'fr' ? t('toastLangFR') : t('toastLangDE'));
+                }
+            });
         });
 
-        document.addEventListener('keydown', e => { if (e.key === 'Escape') hideTip(); });
+        // Toggle rows — click on entire row to toggle checkbox
+        D.toggleRows.forEach(function (row) {
+            row.addEventListener('click', function (e) {
+                if (e.target.closest('.info-btn')) return; // don't toggle if clicking info
+                var id = row.dataset.toggle;
+                var cb = document.getElementById(id);
+                if (cb) {
+                    cb.checked = !cb.checked;
+                    row.classList.toggle('active', cb.checked);
+                    saveForm();
+                    calc();
+                }
+            });
+        });
+
+        // Tooltips
+        $$('.toggle-tooltip-trigger').forEach(function (tr) {
+            var key = tr.dataset.tooltipKey;
+            tr.addEventListener('mouseenter', function (e) { e.stopPropagation(); showTip(tr, t(key)); });
+            tr.addEventListener('mouseleave', hideTip);
+            tr.addEventListener('focus', function () { showTip(tr, t(key)); });
+            tr.addEventListener('blur', hideTip);
+            tr.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); });
+        });
+
+        document.addEventListener('keydown', function (e) { if (e.key === 'Escape') hideTip(); });
+
+        // Dalux panel
+        D.daluxToggle.addEventListener('click', function () {
+            D.daluxPanel.classList.toggle('hidden');
+        });
+        D.daluxClose.addEventListener('click', function () {
+            D.daluxPanel.classList.add('hidden');
+        });
+
+        // Dalux key visibility
+        D.toggleFmVis.addEventListener('click', function () {
+            var inp = D.fmKey;
+            var isPass = inp.type === 'password';
+            inp.type = isPass ? 'text' : 'password';
+            this.querySelector('i').className = isPass ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye';
+        });
+        D.toggleBuildVis.addEventListener('click', function () {
+            var inp = D.buildKey;
+            var isPass = inp.type === 'password';
+            inp.type = isPass ? 'text' : 'password';
+            this.querySelector('i').className = isPass ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye';
+        });
+
+        // Dalux test connections
+        D.testFm.addEventListener('click', function () { testDaluxConnection('fm'); });
+        D.testBuild.addEventListener('click', function () { testDaluxConnection('build'); });
+
+        // Save Dalux config on change
+        [D.fmKey, D.fmUrl, D.buildKey, D.buildUrl].forEach(function (inp) {
+            inp.addEventListener('change', saveDaluxConfig);
+        });
     }
 
     /* ═══════════════════════════════════
        CALCULATION ENGINE
        ═══════════════════════════════════ */
     function calc() {
-        const v = vals();
+        var v = vals();
         if (v.daysPerYear <= 0 || v.incidentsPerDay <= 0 || v.minutesPerIncident <= 0 || v.hourlyRate <= 0) {
             showPlaceholder(); updateMeter(0); return;
         }
 
-        const hrsDay  = (v.incidentsPerDay * v.minutesPerIncident) / 60;
-        const hrsYear = hrsDay * v.daysPerYear;
-        const costNow = hrsYear * v.hourlyRate;
+        var hrsDay  = (v.incidentsPerDay * v.minutesPerIncident) / 60;
+        var hrsYear = hrsDay * v.daysPerYear;
+        var costNow = hrsYear * v.hourlyRate;
 
-        const active = [];
-        let totalPct = 0;
-        Object.entries(OPT).forEach(([k, o]) => {
-            if (v[k]) { active.push({ ...o, k }); totalPct += o.pct; }
+        var active = [];
+        var totalPct = 0;
+        Object.entries(OPT).forEach(function (entry) {
+            var k = entry[0], o = entry[1];
+            if (v[k]) { active.push(Object.assign({}, o, { k: k })); totalPct += o.pct; }
         });
         totalPct = Math.min(totalPct, 1);
 
-        const gross   = costNow * totalPct;
-        const net     = gross - v.costAI;
-        const costNew = costNow - net;
-        const hrsNew  = hrsYear * (1 - totalPct);
-        const roiPct  = v.costAI > 0 ? (net / v.costAI) * 100 : 0;
-        const payback = (v.costAI > 0 && gross > 0) ? Math.ceil((v.costAI / gross) * 12) : 0;
+        var gross   = costNow * totalPct;
+        var net     = gross - v.costAI;
+        var costNew = costNow - net;
+        var hrsNew  = hrsYear * (1 - totalPct);
+        var roiPct  = v.costAI > 0 ? (net / v.costAI) * 100 : 0;
+        var payback = (v.costAI > 0 && gross > 0) ? Math.ceil((v.costAI / gross) * 12) : 0;
 
         updateMeter(totalPct);
 
-        if (active.length === 0) { showPlaceholder(); return; }
+        if (active.length === 0) { showPlaceholder(); hideSankey(); return; }
 
         hidePlaceholder();
         renderSavings(net, totalPct);
@@ -424,32 +541,30 @@
         renderDonut(active, costNow);
         renderBreakdown(active, costNow, v.costAI);
         renderROI(roiPct, payback, v.costAI, net);
+        renderSankey(active, costNow);
     }
 
     function showPlaceholder() { D.placeholder.style.display = 'flex'; D.content.classList.add('hidden'); }
     function hidePlaceholder() { D.placeholder.style.display = 'none';  D.content.classList.remove('hidden'); }
 
     function updateMeter(pct) {
-        const p = Math.round(pct * 100);
+        var p = Math.round(pct * 100);
         D.meterFill.style.width = p + '%';
         D.meterPct.textContent = p + ' %';
-        D.meter.classList.toggle('active', p > 0);
     }
 
     /* ═══════ SAVINGS DISPLAY ═══════ */
     function renderSavings(net, pct) {
         D.hero.innerHTML =
-            '<div class="savings-display">' +
-                '<span class="savings-eyebrow">' + t('heroEyebrow') + '</span>' +
-                '<span class="savings-amount" id="heroValue"></span>' +
-                '<span class="savings-tag">' +
-                    '<span class="badge">' +
-                        '<i class="fa-solid fa-arrow-down"></i> ' +
-                        Math.round(pct * 100) + ' % ' + t('optimization') +
-                    '</span>' +
-                    '&nbsp; ' + t('perYear') +
+            '<span class="savings-eyebrow">' + t('heroEyebrow') + '</span>' +
+            '<span class="savings-amount" id="heroValue"></span>' +
+            '<span class="savings-tag">' +
+                '<span class="badge">' +
+                    '<i class="fa-solid fa-arrow-down"></i> ' +
+                    Math.round(pct * 100) + ' % ' + t('optimization') +
                 '</span>' +
-            '</div>';
+                '&nbsp; ' + t('perYear') +
+            '</span>';
         countUp($('#heroValue'), Math.round(net), fmtCHF);
     }
 
@@ -470,31 +585,31 @@
             '</div>';
         countUp($('#dCostNow'), Math.round(costNow), fmtCHF);
         countUp($('#dCostNew'), Math.round(costNew), fmtCHF);
-        countUp($('#dHours'),   Math.round(hrsNow - hrsNew), n => fmtN(n) + ' ' + t('hours'));
+        countUp($('#dHours'),   Math.round(hrsNow - hrsNew), function (n) { return fmtN(n) + ' ' + t('hours'); });
     }
 
     /* ═══════ BAR CHART ═══════ */
     function renderBarChart(costNow, costNew, costAI) {
-        const dark = document.documentElement.dataset.theme === 'dark';
-        const txt  = dark ? '#807f79' : '#767676';
-        const grid = dark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)';
+        var dark = document.documentElement.dataset.theme === 'dark';
+        var txt  = dark ? '#8b949e' : '#57606a';
+        var grid = dark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.06)';
 
-        const canvas = $('#barChart');
+        var canvas = $('#barChart');
         if (barChart) barChart.destroy();
 
-        const labels = [t('chartCurrent'), t('chartOptimized')];
-        const data   = [costNow, Math.max(0, costNew)];
-        const bg     = [
-            dark ? 'rgba(196,65,65,0.2)' : 'rgba(196,65,65,0.08)',
-            dark ? 'rgba(26,107,90,0.2)' : 'rgba(26,107,90,0.08)'
+        var labels = [t('chartCurrent'), t('chartOptimized')];
+        var data   = [costNow, Math.max(0, costNew)];
+        var bg     = [
+            dark ? 'rgba(248,113,113,0.15)' : 'rgba(248,113,113,0.1)',
+            dark ? 'rgba(0,200,170,0.15)' : 'rgba(0,200,170,0.1)'
         ];
-        const border = ['#c44141', '#1a6b5a'];
+        var border = ['#f87171', '#00c8aa'];
 
         if (costAI > 0) {
             labels.push(t('chartAI'));
             data.push(costAI);
-            bg.push(dark ? 'rgba(184,134,11,0.2)' : 'rgba(184,134,11,0.08)');
-            border.push('#b8860b');
+            bg.push(dark ? 'rgba(212,168,67,0.15)' : 'rgba(212,168,67,0.1)');
+            border.push('#d4a843');
         }
 
         barChart = new Chart(canvas, {
@@ -504,7 +619,7 @@
                 datasets: [{
                     label: t('chartLabel'), data: data,
                     backgroundColor: bg, borderColor: border,
-                    borderWidth: 2, borderRadius: 4, borderSkipped: false
+                    borderWidth: 2, borderRadius: 6, borderSkipped: false
                 }]
             },
             options: {
@@ -513,39 +628,40 @@
                     legend: { display: false },
                     tooltip: {
                         callbacks: { label: function (c) { return fmtCHF(c.raw); } },
-                        backgroundColor: dark ? '#1c1c1a' : '#fff',
+                        backgroundColor: dark ? '#1b2530' : '#fff',
                         titleColor: txt, bodyColor: txt,
-                        borderColor: dark ? '#2d2d2a' : '#dddcd8', borderWidth: 1, padding: 10,
-                        titleFont: { family: 'Outfit', weight: '700', size: 12 },
-                        bodyFont:  { family: 'Outfit', size: 12 },
+                        borderColor: dark ? '#22303e' : '#e4e8ec', borderWidth: 1, padding: 12,
+                        titleFont: { family: 'Inter', weight: '700', size: 12 },
+                        bodyFont:  { family: 'Inter', size: 12 },
+                        cornerRadius: 8,
                     }
                 },
                 scales: {
                     y: {
                         beginAtZero: true, grid: { color: grid },
-                        ticks: { color: txt, font: { family: 'Outfit', weight: '600', size: 10 }, callback: function (v) { return fmtCHF(v); } }
+                        ticks: { color: txt, font: { family: 'Inter', weight: '600', size: 10 }, callback: function (v) { return fmtCHF(v); } }
                     },
                     x: {
                         grid: { display: false },
-                        ticks: { color: txt, font: { family: 'Outfit', weight: '700', size: 11 } }
+                        ticks: { color: txt, font: { family: 'Inter', weight: '700', size: 11 } }
                     }
                 },
-                animation: { duration: 600, easing: 'easeOutQuart' }
+                animation: { duration: 700, easing: 'easeOutQuart' }
             }
         });
     }
 
     /* ═══════ DONUT CHART ═══════ */
     function renderDonut(active, costNow) {
-        const dark = document.documentElement.dataset.theme === 'dark';
-        const txt  = dark ? '#807f79' : '#767676';
+        var dark = document.documentElement.dataset.theme === 'dark';
+        var txt  = dark ? '#8b949e' : '#57606a';
 
-        const canvas = $('#donutChart');
+        var canvas = $('#donutChart');
         if (donutChart) donutChart.destroy();
 
-        const labels = active.map(function (s) { return t(s.key); });
-        const data   = active.map(function (s) { return Math.round(costNow * s.pct); });
-        const colors = active.map(function (s) { return s.color; });
+        var labels = active.map(function (s) { return t(s.key); });
+        var data   = active.map(function (s) { return Math.round(costNow * s.pct); });
+        var colors = active.map(function (s) { return s.color; });
 
         donutChart = new Chart(canvas, {
             type: 'doughnut',
@@ -553,28 +669,27 @@
                 labels: labels,
                 datasets: [{
                     data: data,
-                    backgroundColor: colors.map(function (c) { return c + (dark ? '40' : '22'); }),
+                    backgroundColor: colors.map(function (c) { return c + (dark ? '30' : '20'); }),
                     borderColor: colors,
-                    borderWidth: 2, hoverOffset: 5
+                    borderWidth: 2, hoverOffset: 6
                 }]
             },
             options: {
-                responsive: true, maintainAspectRatio: true, cutout: '62%',
+                responsive: true, maintainAspectRatio: true, cutout: '65%',
                 plugins: {
                     legend: {
                         position: 'bottom',
                         labels: {
-                            color: txt, padding: 12, usePointStyle: true, pointStyleWidth: 8,
-                            font: { family: 'Outfit', weight: '600', size: 10 }
+                            color: txt, padding: 14, usePointStyle: true, pointStyleWidth: 8,
+                            font: { family: 'Inter', weight: '600', size: 10 }
                         }
                     },
                     tooltip: {
                         callbacks: { label: function (c) { return c.label + ': ' + fmtCHF(c.raw); } },
-                        backgroundColor: dark ? '#1c1c1a' : '#fff',
+                        backgroundColor: dark ? '#1b2530' : '#fff',
                         titleColor: txt, bodyColor: txt,
-                        borderColor: dark ? '#2d2d2a' : '#dddcd8', borderWidth: 1, padding: 10,
-                        titleFont: { family: 'Outfit', weight: '700', size: 12 },
-                        bodyFont:  { family: 'Outfit', size: 12 },
+                        borderColor: dark ? '#22303e' : '#e4e8ec', borderWidth: 1, padding: 12,
+                        cornerRadius: 8,
                     }
                 },
                 animation: { animateRotate: true, duration: 700 }
@@ -585,22 +700,19 @@
     /* ═══════ BREAKDOWN ═══════ */
     function renderBreakdown(active, costNow, costAI) {
         var html = '<h3 class="breakdown-title">' + t('breakdown') + '</h3>';
-
         active.forEach(function (s, i) {
             var amt = costNow * s.pct;
-            html += '<div class="breakdown-row" style="animation-delay:' + (i * 40) + 'ms">' +
+            html += '<div class="breakdown-row" style="animation-delay:' + (i * 50) + 'ms">' +
                 '<span class="breakdown-left">' + t(s.key) + ' (' + Math.round(s.pct * 100) + ' %)</span>' +
                 '<span class="breakdown-right pos">+ ' + fmtCHF(amt) + '</span>' +
             '</div>';
         });
-
         if (costAI > 0) {
-            html += '<div class="breakdown-row" style="animation-delay:' + (active.length * 40) + 'ms">' +
+            html += '<div class="breakdown-row" style="animation-delay:' + (active.length * 50) + 'ms">' +
                 '<span class="breakdown-left">' + t('aiInvestment') + '</span>' +
                 '<span class="breakdown-right neg">− ' + fmtCHF(costAI) + '</span>' +
             '</div>';
         }
-
         D.detailed.innerHTML = html;
     }
 
@@ -620,23 +732,410 @@
         D.roi.innerHTML =
             '<h3 class="roi-title">' + t('roi') + '</h3>' +
             '<div class="roi-grid">' +
-                '<div class="roi-item">' +
-                    '<div class="roi-val" style="color:' + roiColor + '">' + Math.round(roiPct) + ' %</div>' +
-                    '<div class="roi-label">' + t('roiLabel') + '</div>' +
-                '</div>' +
-                '<div class="roi-item">' +
-                    '<div class="roi-val">' + payTxt + '</div>' +
-                    '<div class="roi-label">' + t('paybackPeriod') + '</div>' +
-                '</div>' +
-                '<div class="roi-item">' +
-                    '<div class="roi-val">' + fmtCHF(costAI) + '</div>' +
-                    '<div class="roi-label">' + t('investment') + '</div>' +
-                '</div>' +
-                '<div class="roi-item">' +
-                    '<div class="roi-val" style="color:' + netColor + '">' + fmtCHF(net) + '</div>' +
-                    '<div class="roi-label">' + t('netProfit') + '</div>' +
-                '</div>' +
+                '<div class="roi-item"><div class="roi-val" style="color:' + roiColor + '">' + Math.round(roiPct) + ' %</div><div class="roi-label">' + t('roiLabel') + '</div></div>' +
+                '<div class="roi-item"><div class="roi-val">' + payTxt + '</div><div class="roi-label">' + t('paybackPeriod') + '</div></div>' +
+                '<div class="roi-item"><div class="roi-val">' + fmtCHF(costAI) + '</div><div class="roi-label">' + t('investment') + '</div></div>' +
+                '<div class="roi-item"><div class="roi-val" style="color:' + netColor + '">' + fmtCHF(net) + '</div><div class="roi-label">' + t('netProfit') + '</div></div>' +
             '</div>';
+    }
+
+    /* ═══════════════════════════════════
+       SANKEY DIAGRAM — Handover Analysis
+       ═══════════════════════════════════ */
+    function hideSankey() {
+        D.sankeySection.classList.add('hidden');
+    }
+
+    function renderSankey(active, costNow) {
+        D.sankeySection.classList.remove('hidden');
+
+        // Clear previous
+        D.sankeyChart.innerHTML = '';
+        D.sankeyLegend.innerHTML = '';
+
+        var width = D.sankeyChart.clientWidth - 40;
+        var height = 400;
+
+        // Build Sankey data: Handover → Factors → Impact
+        var nodes = [
+            { id: 'handover',   name: currentLang === 'fr' ? 'Handover Dalux' : 'Handover Dalux' },
+            { id: 'dtwin',      name: t('digitalTwinFactor') },
+            { id: 'assets',     name: t('assetsLinkedFactor') },
+            { id: 'docs',       name: t('docFactor') },
+            { id: 'automation', name: t('autoFactor') },
+            { id: 'savings',    name: currentLang === 'fr' ? 'Économies réalisées' : 'Realisierte Einsparungen' },
+            { id: 'remaining',  name: currentLang === 'fr' ? 'Coûts restants' : 'Verbleibende Kosten' },
+            { id: 'blocked',    name: currentLang === 'fr' ? 'Points bloquants' : 'Blockierpunkte' },
+        ];
+
+        var links = [];
+        var factorMap = {
+            optZwilling: 'dtwin',
+            optAssets: 'assets',
+            optDoku: 'docs',
+            optAuto: 'automation'
+        };
+
+        // From handover to each factor
+        active.forEach(function (s) {
+            var val = costNow * s.pct;
+            links.push({ source: 'handover', target: factorMap[s.k], value: val });
+            links.push({ source: factorMap[s.k], target: 'savings', value: val * 0.85 });
+            links.push({ source: factorMap[s.k], target: 'blocked', value: val * 0.15 });
+        });
+
+        // Inactive factors flow to remaining costs
+        var inactiveTotal = 0;
+        Object.entries(OPT).forEach(function (entry) {
+            var k = entry[0], o = entry[1];
+            var isActive = active.some(function (a) { return a.k === k; });
+            if (!isActive) {
+                inactiveTotal += costNow * o.pct;
+            }
+        });
+        if (inactiveTotal > 0) {
+            links.push({ source: 'handover', target: 'remaining', value: inactiveTotal });
+        }
+
+        // Add base remaining cost (non-optimizable)
+        // Always show some flow to remaining
+        if (links.filter(function(l) { return l.target === 'remaining'; }).length === 0) {
+            links.push({ source: 'handover', target: 'remaining', value: costNow * 0.01 });
+        }
+
+        // Filter out zero-value links
+        links = links.filter(function (l) { return l.value > 0; });
+
+        // Node index map
+        var nodeIndex = {};
+        nodes.forEach(function (n, i) { nodeIndex[n.id] = i; });
+
+        // Colors for nodes
+        var nodeColors = {
+            handover: '#60a5fa',
+            dtwin: '#00c8aa',
+            assets: '#60a5fa',
+            docs: '#a87ad4',
+            automation: '#d4a843',
+            savings: '#2dd4a0',
+            remaining: '#f87171',
+            blocked: '#f0b429',
+        };
+
+        // D3 Sankey
+        var svg = d3.select(D.sankeyChart)
+            .append('svg')
+            .attr('width', width + 40)
+            .attr('height', height + 20)
+            .append('g')
+            .attr('transform', 'translate(20,10)');
+
+        var sankey = d3.sankey()
+            .nodeWidth(20)
+            .nodePadding(16)
+            .nodeAlign(d3.sankeyLeft)
+            .extent([[0, 0], [width, height]]);
+
+        var graph = sankey({
+            nodes: nodes.map(function (n) { return Object.assign({}, n); }),
+            links: links.map(function (l) {
+                return { source: nodeIndex[l.source], target: nodeIndex[l.target], value: l.value };
+            })
+        });
+
+        // Links
+        var link = svg.append('g')
+            .selectAll('.sankey-link')
+            .data(graph.links)
+            .join('path')
+            .attr('class', 'sankey-link')
+            .attr('d', d3.sankeyLinkHorizontal())
+            .attr('fill', 'none')
+            .attr('stroke', function (d) { return nodeColors[nodes[d.source.index].id] || '#8b949e'; })
+            .attr('stroke-opacity', 0.3)
+            .attr('stroke-width', function (d) { return Math.max(2, d.width); })
+            .style('transition', 'stroke-opacity 0.25s ease');
+
+        link.on('mouseenter', function () { d3.select(this).attr('stroke-opacity', 0.6); })
+            .on('mouseleave', function () { d3.select(this).attr('stroke-opacity', 0.3); });
+
+        // Link tooltips
+        link.append('title')
+            .text(function (d) {
+                return nodes[d.source.index].name + ' → ' + nodes[d.target.index].name + ': ' + fmtCHF(d.value);
+            });
+
+        // Nodes
+        var node = svg.append('g')
+            .selectAll('.sankey-node')
+            .data(graph.nodes)
+            .join('g')
+            .attr('class', 'sankey-node');
+
+        node.append('rect')
+            .attr('x', function (d) { return d.x0; })
+            .attr('y', function (d) { return d.y0; })
+            .attr('height', function (d) { return Math.max(2, d.y1 - d.y0); })
+            .attr('width', sankey.nodeWidth())
+            .attr('fill', function (d) { return nodeColors[nodes[d.index].id] || '#8b949e'; })
+            .attr('rx', 4)
+            .attr('opacity', 0.9);
+
+        // Node labels
+        node.append('text')
+            .attr('x', function (d) { return d.x0 < width / 2 ? d.x1 + 8 : d.x0 - 8; })
+            .attr('y', function (d) { return (d.y1 + d.y0) / 2; })
+            .attr('dy', '0.35em')
+            .attr('text-anchor', function (d) { return d.x0 < width / 2 ? 'start' : 'end'; })
+            .attr('fill', function () {
+                return document.documentElement.dataset.theme === 'dark' ? '#c9d1d9' : '#24292f';
+            })
+            .attr('font-size', '12px')
+            .attr('font-family', 'Inter, sans-serif')
+            .attr('font-weight', '600')
+            .text(function (d) { return d.name; });
+
+        // Node value labels
+        node.append('text')
+            .attr('x', function (d) { return d.x0 < width / 2 ? d.x1 + 8 : d.x0 - 8; })
+            .attr('y', function (d) { return (d.y1 + d.y0) / 2 + 16; })
+            .attr('text-anchor', function (d) { return d.x0 < width / 2 ? 'start' : 'end'; })
+            .attr('fill', function () {
+                return document.documentElement.dataset.theme === 'dark' ? '#8b949e' : '#57606a';
+            })
+            .attr('font-size', '10px')
+            .attr('font-family', 'JetBrains Mono, monospace')
+            .text(function (d) { return d.value > 0 ? fmtCHF(d.value) : ''; });
+
+        // Legend
+        var legendItems = [
+            { color: '#60a5fa', label: 'Handover Dalux' },
+            { color: '#00c8aa', label: t('digitalTwinFactor') },
+            { color: '#2dd4a0', label: currentLang === 'fr' ? 'Économies' : 'Einsparungen' },
+            { color: '#f0b429', label: currentLang === 'fr' ? 'Points bloquants' : 'Blockierpunkte' },
+            { color: '#f87171', label: currentLang === 'fr' ? 'Coûts restants' : 'Verbleibende Kosten' },
+        ];
+
+        legendItems.forEach(function (item) {
+            D.sankeyLegend.innerHTML +=
+                '<div class="sankey-legend-item">' +
+                    '<span class="sankey-legend-dot" style="background:' + item.color + '"></span>' +
+                    '<span>' + item.label + '</span>' +
+                '</div>';
+        });
+    }
+
+    /* ═══════════════════════════════════
+       DALUX API CONNECTION
+       ═══════════════════════════════════ */
+    function saveDaluxConfig() {
+        var config = {
+            fmKey: D.fmKey.value,
+            fmUrl: D.fmUrl.value,
+            buildKey: D.buildKey.value,
+            buildUrl: D.buildUrl.value,
+        };
+        localStorage.setItem('stoffice-dalux', JSON.stringify(config));
+    }
+
+    function loadDaluxConfig() {
+        try {
+            var s = localStorage.getItem('stoffice-dalux');
+            if (!s) return;
+            var c = JSON.parse(s);
+            if (c.fmKey) D.fmKey.value = c.fmKey;
+            if (c.fmUrl) D.fmUrl.value = c.fmUrl;
+            if (c.buildKey) D.buildKey.value = c.buildKey;
+            if (c.buildUrl) D.buildUrl.value = c.buildUrl;
+        } catch (e) { /* ignore */ }
+    }
+
+    function testDaluxConnection(type) {
+        var key, url, statusEl, resultEl, endpoint;
+
+        if (type === 'fm') {
+            key = D.fmKey.value.trim();
+            url = D.fmUrl.value.trim();
+            statusEl = D.fmStatus;
+            resultEl = D.fmResult;
+            endpoint = '/2.0/buildings';
+        } else {
+            key = D.buildKey.value.trim();
+            url = D.buildUrl.value.trim();
+            statusEl = D.buildStatus;
+            resultEl = D.buildResult;
+            endpoint = '/5.1/projects';
+        }
+
+        if (!key) {
+            showDaluxResult(resultEl, 'error', currentLang === 'fr' ? 'Veuillez saisir une clé API' : 'Bitte geben Sie einen API-Schlüssel ein');
+            return;
+        }
+
+        // Update status to connecting
+        statusEl.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>' + t('connecting') + '</span>';
+        statusEl.className = 'dalux-status';
+
+        saveDaluxConfig();
+
+        // Test the connection
+        fetch(url + endpoint, {
+            method: 'GET',
+            headers: {
+                'X-API-KEY': key,
+                'Accept': 'application/json'
+            }
+        })
+        .then(function (response) {
+            if (response.ok) {
+                return response.json().then(function (data) {
+                    statusEl.innerHTML = '<i class="fa-solid fa-circle"></i> <span>' + t('connected') + '</span>';
+                    statusEl.className = 'dalux-status connected';
+
+                    var count = 0;
+                    if (data && Array.isArray(data)) count = data.length;
+                    else if (data && data.items) count = data.items.length;
+                    else if (data && data.data) count = data.data.length;
+
+                    var msg = type === 'fm'
+                        ? (currentLang === 'fr' ? 'Connecté ! ' + count + ' bâtiment(s) trouvé(s).' : 'Verbunden! ' + count + ' Gebäude gefunden.')
+                        : (currentLang === 'fr' ? 'Connecté ! ' + count + ' projet(s) trouvé(s).' : 'Verbunden! ' + count + ' Projekt(e) gefunden.');
+
+                    showDaluxResult(resultEl, 'success', msg);
+                    toast(msg);
+
+                    if (type === 'fm') {
+                        loadDaluxFmData(key, url);
+                    }
+                });
+            } else if (response.status === 401 || response.status === 403) {
+                throw new Error(currentLang === 'fr' ? 'Clé API invalide ou expirée (HTTP ' + response.status + ')' : 'Ungültiger oder abgelaufener API-Schlüssel (HTTP ' + response.status + ')');
+            } else {
+                throw new Error('HTTP ' + response.status + ' — ' + response.statusText);
+            }
+        })
+        .catch(function (err) {
+            statusEl.innerHTML = '<i class="fa-solid fa-circle"></i> <span>' + t('disconnected') + '</span>';
+            statusEl.className = 'dalux-status';
+
+            var errMsg = err.message;
+            if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
+                errMsg = currentLang === 'fr'
+                    ? 'Erreur réseau — vérifiez l\'URL et CORS. L\'API Dalux peut nécessiter un proxy backend.'
+                    : 'Netzwerkfehler — Überprüfen Sie die URL und CORS. Die Dalux-API benötigt möglicherweise einen Backend-Proxy.';
+            }
+            showDaluxResult(resultEl, 'error', errMsg);
+        });
+    }
+
+    function showDaluxResult(el, type, msg) {
+        el.classList.remove('hidden', 'success', 'error');
+        el.classList.add(type);
+        el.innerHTML = '<i class="fa-solid ' + (type === 'success' ? 'fa-check-circle' : 'fa-exclamation-triangle') + '"></i> ' + msg;
+    }
+
+    /* ═══════ LOAD DALUX FM DATA ═══════ */
+    function loadDaluxFmData(key, url) {
+        D.daluxDataSection.classList.remove('hidden');
+        D.daluxDataGrid.innerHTML = '<div class="dalux-stat-card"><p style="color:var(--text-2)"><i class="fa-solid fa-spinner fa-spin"></i> ' + (currentLang === 'fr' ? 'Chargement des données…' : 'Daten werden geladen…') + '</p></div>';
+
+        var stats = {
+            buildings: 0,
+            assets: 0,
+            workorders: 0,
+            tickets: 0,
+        };
+
+        // Fetch buildings
+        var fetchBuildings = fetch(url + '/2.0/buildings', { headers: { 'X-API-KEY': key, 'Accept': 'application/json' } })
+            .then(function (r) { return r.json(); })
+            .then(function (d) {
+                var items = d.items || d.data || (Array.isArray(d) ? d : []);
+                stats.buildings = items.length;
+            })
+            .catch(function () { stats.buildings = '—'; });
+
+        // Fetch work orders
+        var fetchWO = fetch(url + '/2.2/workorders', { headers: { 'X-API-KEY': key, 'Accept': 'application/json' } })
+            .then(function (r) { return r.json(); })
+            .then(function (d) {
+                var items = d.items || d.data || (Array.isArray(d) ? d : []);
+                stats.workorders = items.length;
+            })
+            .catch(function () { stats.workorders = '—'; });
+
+        // Fetch assets
+        var fetchAssets = fetch(url + '/2.0/assets', { headers: { 'X-API-KEY': key, 'Accept': 'application/json' } })
+            .then(function (r) { return r.json(); })
+            .then(function (d) {
+                var items = d.items || d.data || (Array.isArray(d) ? d : []);
+                stats.assets = items.length;
+            })
+            .catch(function () { stats.assets = '—'; });
+
+        // Fetch tickets
+        var fetchTickets = fetch(url + '/2.0/tickets', { headers: { 'X-API-KEY': key, 'Accept': 'application/json' } })
+            .then(function (r) { return r.json(); })
+            .then(function (d) {
+                var items = d.items || d.data || (Array.isArray(d) ? d : []);
+                stats.tickets = items.length;
+            })
+            .catch(function () { stats.tickets = '—'; });
+
+        Promise.all([fetchBuildings, fetchWO, fetchAssets, fetchTickets]).then(function () {
+            renderDaluxData(stats);
+        });
+    }
+
+    function renderDaluxData(stats) {
+        var cards = [
+            {
+                icon: 'fa-building',
+                color: '--info',
+                bg: 'rgba(96,165,250,0.1)',
+                value: stats.buildings,
+                label: currentLang === 'fr' ? 'Bâtiments' : 'Gebäude',
+                sub: 'DALUX FM'
+            },
+            {
+                icon: 'fa-cube',
+                color: '--accent',
+                bg: 'rgba(0,200,170,0.1)',
+                value: stats.assets,
+                label: currentLang === 'fr' ? 'Équipements' : 'Anlagen',
+                sub: 'ASSETS'
+            },
+            {
+                icon: 'fa-wrench',
+                color: '--gold',
+                bg: 'rgba(212,168,67,0.1)',
+                value: stats.workorders,
+                label: currentLang === 'fr' ? 'Ordres de travail' : 'Arbeitsaufträge',
+                sub: 'WORK ORDERS'
+            },
+            {
+                icon: 'fa-ticket',
+                color: '--coral',
+                bg: 'rgba(232,115,90,0.1)',
+                value: stats.tickets,
+                label: currentLang === 'fr' ? 'Tickets' : 'Tickets',
+                sub: 'TICKETS'
+            }
+        ];
+
+        var html = '';
+        cards.forEach(function (c) {
+            html += '<div class="dalux-stat-card">' +
+                '<div class="dalux-stat-icon" style="background:' + c.bg + ';color:var(' + c.color + ')">' +
+                    '<i class="fa-solid ' + c.icon + '"></i>' +
+                '</div>' +
+                '<div class="dalux-stat-value">' + c.value + '</div>' +
+                '<div class="dalux-stat-label">' + c.label + '</div>' +
+                '<div class="dalux-stat-sub">' + c.sub + '</div>' +
+            '</div>';
+        });
+
+        D.daluxDataGrid.innerHTML = html;
     }
 
     /* ═══════ BOOT ═══════ */

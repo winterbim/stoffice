@@ -1,236 +1,381 @@
 <!DOCTYPE html>
-<html lang="de" data-theme="light" data-lang="de">
+<html lang="de" data-theme="dark" data-lang="de">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description"
-        content="Stoffice – Smart Building AI Kostenrechner für Facility Management Optimierung">
+    <meta name="description" content="Stoffice – Smart Building AI Kostenrechner für Facility Management Optimierung">
     <title>Stoffice | Smart Building AI</title>
 
-    <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
 
-    <!-- Fonts: DM Serif Display (display numbers) + Outfit (body) -->
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Outfit:wght@300;400;500;600;700;800&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-    <!-- Chart.js -->
+    <!-- Chart.js + D3 Sankey -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3-sankey@0.12.3"></script>
 
     <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body>
+    <!-- Grain overlay -->
+    <div class="grain"></div>
+
     <!-- Toast portal -->
     <div class="toast-stack" id="toastContainer" aria-live="polite"></div>
 
     <!-- Tooltip portal -->
-    <div class="tip" id="customTooltip" role="tooltip" aria-label="Information">.</div>
+    <div class="tip" id="customTooltip" role="tooltip"></div>
 
     <!-- ═══ HEADER ═══ -->
     <header class="header">
-        <div class="header-inner">
-            <a href="/" class="brand" aria-label="Stoffice Home">
-                <svg class="brand-icon" width="30" height="30" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-                    <rect width="32" height="32" rx="8" fill="currentColor" />
-                    <path d="M8 22V12l8-5 8 5v10l-8-4-8 4z" fill="#fff" fill-opacity=".92" />
-                </svg>
-                <span class="brand-name">Stoffice</span>
-            </a>
+        <div class="wrap">
+            <div class="header-inner">
+                <a href="/" class="brand" aria-label="Stoffice Home">
+                    <span class="brand-mark">St</span><span class="brand-word">office</span>
+                    <span class="brand-dot"></span>
+                </a>
 
-            <div class="header-actions">
-                <div class="lang-toggle" id="langSwitcher">
-                    <button class="lang-btn active" data-lang-btn="de">DE</button>
-                    <button class="lang-btn" data-lang-btn="fr">FR</button>
+                <div class="header-actions">
+                    <div class="lang" id="langSwitcher">
+                        <button class="lang-btn active" data-lang-btn="de">DE</button>
+                        <span class="lang-sep">|</span>
+                        <button class="lang-btn" data-lang-btn="fr">FR</button>
+                    </div>
+                    <button class="ibtn" id="darkModeToggle" aria-label="Theme wechseln">
+                        <i class="fa-solid fa-sun" id="darkModeIcon"></i>
+                    </button>
+                    <button class="ibtn" id="exportPdf" aria-label="PDF exportieren">
+                        <i class="fa-solid fa-file-arrow-down"></i>
+                    </button>
+                    <button class="ibtn" id="daluxConfigToggle" aria-label="Dalux API">
+                        <i class="fa-solid fa-plug"></i>
+                    </button>
                 </div>
-                <button class="icon-btn" id="darkModeToggle" aria-label="Theme wechseln">
-                    <i class="fa-solid fa-moon" id="darkModeIcon"></i>
-                </button>
-                <button class="icon-btn" id="exportPdf" aria-label="PDF exportieren">
-                    <i class="fa-solid fa-file-arrow-down"></i>
-                </button>
             </div>
         </div>
     </header>
 
+    <!-- ═══ DALUX API PANEL ═══ -->
+    <div class="dalux-panel hidden" id="daluxPanel">
+        <div class="wrap">
+            <div class="dalux-panel-inner">
+                <div class="dalux-panel-header">
+                    <div class="dalux-panel-title">
+                        <i class="fa-solid fa-plug"></i>
+                        <span data-i18n="daluxTitle">Dalux API Verbindung</span>
+                    </div>
+                    <button class="ibtn ibtn-sm" id="daluxPanelClose">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <div class="dalux-grid">
+                    <!-- FM API -->
+                    <div class="dalux-card">
+                        <div class="dalux-card-head">
+                            <span class="dalux-card-icon"><i class="fa-solid fa-building"></i></span>
+                            <div>
+                                <h4>Dalux FM</h4>
+                                <p class="dalux-card-sub" data-i18n="daluxFmSub">Facility Management API</p>
+                            </div>
+                            <span class="dalux-status" id="fmStatus">
+                                <i class="fa-solid fa-circle"></i>
+                                <span data-i18n="disconnected">Getrennt</span>
+                            </span>
+                        </div>
+                        <div class="dalux-field">
+                            <label for="daluxFmKey" data-i18n="apiKey">API-Schlüssel (X-API-KEY)</label>
+                            <div class="dalux-input-row">
+                                <input type="password" id="daluxFmKey" placeholder="FM-xxxxxxxx-xxxx-xxxx-xxxx" autocomplete="off">
+                                <button class="ibtn ibtn-sm" id="toggleFmKeyVis" aria-label="Toggle visibility">
+                                    <i class="fa-solid fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="dalux-field">
+                            <label for="daluxFmUrl" data-i18n="baseUrl">Base URL</label>
+                            <input type="url" id="daluxFmUrl" value="https://fm-api.dalux.com/api" placeholder="https://fm-api.dalux.com/api">
+                        </div>
+                        <button class="btn btn-accent" id="testFmConnection">
+                            <i class="fa-solid fa-bolt"></i>
+                            <span data-i18n="testConnection">Verbindung testen</span>
+                        </button>
+                        <div class="dalux-result hidden" id="fmResult"></div>
+                    </div>
+
+                    <!-- Build API -->
+                    <div class="dalux-card">
+                        <div class="dalux-card-head">
+                            <span class="dalux-card-icon"><i class="fa-solid fa-helmet-safety"></i></span>
+                            <div>
+                                <h4>Dalux Build</h4>
+                                <p class="dalux-card-sub" data-i18n="daluxBuildSub">Field / Handover API</p>
+                            </div>
+                            <span class="dalux-status" id="buildStatus">
+                                <i class="fa-solid fa-circle"></i>
+                                <span data-i18n="disconnected">Getrennt</span>
+                            </span>
+                        </div>
+                        <div class="dalux-field">
+                            <label for="daluxBuildKey" data-i18n="apiKey">API-Schlüssel (X-API-KEY)</label>
+                            <div class="dalux-input-row">
+                                <input type="password" id="daluxBuildKey" placeholder="BUILD-xxxxxxxx-xxxx-xxxx" autocomplete="off">
+                                <button class="ibtn ibtn-sm" id="toggleBuildKeyVis" aria-label="Toggle visibility">
+                                    <i class="fa-solid fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="dalux-field">
+                            <label for="daluxBuildUrl" data-i18n="baseUrl">Base URL</label>
+                            <input type="url" id="daluxBuildUrl" value="https://field.dalux.com/service/api" placeholder="https://field.dalux.com/service/api">
+                        </div>
+                        <button class="btn btn-accent" id="testBuildConnection">
+                            <i class="fa-solid fa-bolt"></i>
+                            <span data-i18n="testConnection">Verbindung testen</span>
+                        </button>
+                        <div class="dalux-result hidden" id="buildResult"></div>
+                    </div>
+                </div>
+
+                <div class="dalux-footer">
+                    <p class="dalux-hint">
+                        <i class="fa-solid fa-shield-halved"></i>
+                        <span data-i18n="daluxHint">Ihre API-Schlüssel werden nur lokal in Ihrem Browser gespeichert und niemals an unsere Server übertragen.</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- ═══ MAIN ═══ -->
     <main class="main">
-        <!-- Intro -->
-        <div class="intro">
-            <h1 data-i18n="title">Smart Building AI<br>Kostenrechner</h1>
-            <p class="intro-sub" data-i18n="subtitle">Berechnen Sie Einsparungen durch KI-gestützte
-                Gebäudeautomation</p>
-        </div>
+        <div class="wrap">
+            <!-- Hero -->
+            <div class="hero">
+                <div class="eyebrow">
+                    <i class="fa-solid fa-cube"></i>
+                    <span>Stoffice v6.0</span>
+                </div>
+                <h1 class="display" data-i18n="title">Smart Building <em>AI</em></h1>
+                <p class="lede" data-i18n="subtitle">Berechnen Sie Einsparungen durch KI-gestützte Gebäudeautomation</p>
+            </div>
 
-        <!-- Calculator Grid -->
-        <div class="calc">
-            <!-- ── INPUT ── -->
-            <section class="calc-input" aria-labelledby="inputHeading">
-                <h2 class="panel-title" id="inputHeading" data-i18n="inputVariables">Eingabevariablen</h2>
-
-                <form id="calculation-form" novalidate>
-                    <div class="field-row">
-                        <div class="field">
-                            <label for="daysPerYear" data-i18n="daysPerYear">Arbeitstage / Jahr</label>
-                            <div class="field-input">
-                                <input type="number" id="daysPerYear" value="250" min="1" max="365">
-                                <span class="field-unit" data-i18n="unitDays">T</span>
-                            </div>
-                        </div>
-                        <div class="field">
-                            <label for="incidentsPerDay" data-i18n="incidentsPerDay">Vorfälle / Tag</label>
-                            <div class="field-input">
-                                <input type="number" id="incidentsPerDay" value="30" min="0" max="500">
-                                <span class="field-unit">/d</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="field-row">
-                        <div class="field">
-                            <label for="minutesPerIncident" data-i18n="minutesPerIncident">Minuten / Vorfall</label>
-                            <div class="field-input">
-                                <input type="number" id="minutesPerIncident" value="48" min="1" max="480">
-                                <span class="field-unit">min</span>
-                            </div>
-                        </div>
-                        <div class="field">
-                            <label for="hourlyRate" data-i18n="hourlyRate">Stundensatz (CHF)</label>
-                            <div class="field-input">
-                                <input type="number" id="hourlyRate" value="85" min="1" max="500">
-                                <span class="field-unit">CHF</span>
-                            </div>
-                        </div>
+            <!-- Calculator Grid -->
+            <div class="calc">
+                <!-- ── INPUT ── -->
+                <section class="card" aria-labelledby="inputHeading">
+                    <div class="card-head">
+                        <span class="card-num">01</span>
+                        <h2 class="card-title" id="inputHeading" data-i18n="inputVariables">Eingabevariablen</h2>
                     </div>
 
-                    <div class="sep"></div>
-
-                    <div class="field">
-                        <label for="costAI" data-i18n="costAI">Kosten der AI-Lösung (CHF / Jahr)</label>
-                        <div class="field-input">
-                            <input type="number" id="costAI" value="0" min="0" placeholder="0">
-                            <span class="field-unit">CHF/a</span>
+                    <form id="calculation-form" novalidate>
+                        <div class="grid-2">
+                            <div class="field">
+                                <label for="daysPerYear" data-i18n="daysPerYear">Arbeitstage / Jahr</label>
+                                <div class="field-input">
+                                    <input type="number" id="daysPerYear" value="250" min="1" max="365">
+                                    <span class="field-unit" data-i18n="unitDays">T</span>
+                                </div>
+                            </div>
+                            <div class="field">
+                                <label for="incidentsPerDay" data-i18n="incidentsPerDay">Vorfälle / Tag</label>
+                                <div class="field-input">
+                                    <input type="number" id="incidentsPerDay" value="30" min="0" max="500">
+                                    <span class="field-unit">/d</span>
+                                </div>
+                            </div>
                         </div>
-                    </div>
+                        <div class="grid-2">
+                            <div class="field">
+                                <label for="minutesPerIncident" data-i18n="minutesPerIncident">Minuten / Vorfall</label>
+                                <div class="field-input">
+                                    <input type="number" id="minutesPerIncident" value="48" min="1" max="480">
+                                    <span class="field-unit">min</span>
+                                </div>
+                            </div>
+                            <div class="field">
+                                <label for="hourlyRate" data-i18n="hourlyRate">Stundensatz (CHF)</label>
+                                <div class="field-input">
+                                    <input type="number" id="hourlyRate" value="85" min="1" max="500">
+                                    <span class="field-unit">CHF</span>
+                                </div>
+                            </div>
+                        </div>
 
-                    <div class="sep"></div>
+                        <div class="rule"></div>
 
-                    <h3 class="group-label" data-i18n="optimizationFactors">Optimierungsfaktoren</h3>
+                        <div class="field field-wide">
+                            <label for="costAI" data-i18n="costAI">Kosten der AI-Lösung (CHF / Jahr)</label>
+                            <div class="field-input">
+                                <input type="number" id="costAI" value="0" min="0" placeholder="0">
+                                <span class="field-unit">CHF/a</span>
+                            </div>
+                        </div>
 
-                    <div class="toggles">
-                        <label class="toggle">
-                            <div class="toggle-text">
-                                <span class="toggle-name" data-i18n="digitalTwin">Digitaler Zwilling
-                                    vorhanden</span>
+                        <div class="rule"></div>
+
+                        <div class="sub-head">
+                            <h3 class="sub-title" data-i18n="optimizationFactors">Optimierungsfaktoren</h3>
+                        </div>
+
+                        <div class="toggles" id="togglesContainer">
+                            <div class="toggle-row" data-toggle="optZwilling">
+                                <div class="toggle-main">
+                                    <span class="toggle-name" data-i18n="digitalTwin">Digitaler Zwilling vorhanden</span>
+                                    <button type="button" class="info-btn toggle-tooltip-trigger" data-tooltip-key="digitalTwinTip" aria-label="Info">
+                                        <i class="fa-solid fa-circle-info"></i>
+                                    </button>
+                                </div>
                                 <span class="toggle-pct">75 %</span>
+                                <div class="switch">
+                                    <input type="checkbox" id="optZwilling">
+                                    <span class="switch-track"></span>
+                                </div>
                             </div>
-                            <button type="button" class="toggle-info toggle-tooltip-trigger"
-                                data-tooltip-key="digitalTwinTip" aria-label="Info">
-                                <i class="fa-solid fa-circle-info"></i>
-                            </button>
-                            <input type="checkbox" id="optZwilling">
-                            <span class="toggle-track" aria-hidden="true"></span>
-                        </label>
-                        <label class="toggle">
-                            <div class="toggle-text">
-                                <span class="toggle-name" data-i18n="assetsLinked">Anlagen im digitalen
-                                    Zwilling</span>
+                            <div class="toggle-row" data-toggle="optAssets">
+                                <div class="toggle-main">
+                                    <span class="toggle-name" data-i18n="assetsLinked">Anlagen im digitalen Zwilling</span>
+                                    <button type="button" class="info-btn toggle-tooltip-trigger" data-tooltip-key="assetsLinkedTip" aria-label="Info">
+                                        <i class="fa-solid fa-circle-info"></i>
+                                    </button>
+                                </div>
                                 <span class="toggle-pct">10 %</span>
+                                <div class="switch">
+                                    <input type="checkbox" id="optAssets">
+                                    <span class="switch-track"></span>
+                                </div>
                             </div>
-                            <button type="button" class="toggle-info toggle-tooltip-trigger"
-                                data-tooltip-key="assetsLinkedTip" aria-label="Info">
-                                <i class="fa-solid fa-circle-info"></i>
-                            </button>
-                            <input type="checkbox" id="optAssets">
-                            <span class="toggle-track" aria-hidden="true"></span>
-                        </label>
-                        <label class="toggle">
-                            <div class="toggle-text">
-                                <span class="toggle-name" data-i18n="docUpToDate">Dokumentation immer aktuell</span>
+                            <div class="toggle-row" data-toggle="optDoku">
+                                <div class="toggle-main">
+                                    <span class="toggle-name" data-i18n="docUpToDate">Dokumentation immer aktuell</span>
+                                    <button type="button" class="info-btn toggle-tooltip-trigger" data-tooltip-key="docUpToDateTip" aria-label="Info">
+                                        <i class="fa-solid fa-circle-info"></i>
+                                    </button>
+                                </div>
                                 <span class="toggle-pct">5 %</span>
+                                <div class="switch">
+                                    <input type="checkbox" id="optDoku">
+                                    <span class="switch-track"></span>
+                                </div>
                             </div>
-                            <button type="button" class="toggle-info toggle-tooltip-trigger"
-                                data-tooltip-key="docUpToDateTip" aria-label="Info">
-                                <i class="fa-solid fa-circle-info"></i>
-                            </button>
-                            <input type="checkbox" id="optDoku">
-                            <span class="toggle-track" aria-hidden="true"></span>
-                        </label>
-                        <label class="toggle">
-                            <div class="toggle-text">
-                                <span class="toggle-name" data-i18n="autoOrders">Automatisierte
-                                    Auftragserstellung</span>
+                            <div class="toggle-row" data-toggle="optAuto">
+                                <div class="toggle-main">
+                                    <span class="toggle-name" data-i18n="autoOrders">Automatisierte Auftragserstellung</span>
+                                    <button type="button" class="info-btn toggle-tooltip-trigger" data-tooltip-key="autoOrdersTip" aria-label="Info">
+                                        <i class="fa-solid fa-circle-info"></i>
+                                    </button>
+                                </div>
                                 <span class="toggle-pct">10 %</span>
+                                <div class="switch">
+                                    <input type="checkbox" id="optAuto">
+                                    <span class="switch-track"></span>
+                                </div>
                             </div>
-                            <button type="button" class="toggle-info toggle-tooltip-trigger"
-                                data-tooltip-key="autoOrdersTip" aria-label="Info">
-                                <i class="fa-solid fa-circle-info"></i>
+                        </div>
+
+                        <!-- Meter -->
+                        <div class="meter" id="savingsBarContainer">
+                            <div class="meter-head">
+                                <span data-i18n="totalOptimization">Gesamtoptimierung</span>
+                                <strong id="savingsBarPercent">0 %</strong>
+                            </div>
+                            <div class="meter-track">
+                                <div class="meter-fill" id="savingsBarFill"></div>
+                            </div>
+                        </div>
+
+                        <div class="actions">
+                            <button type="button" class="btn btn-ghost" id="resetBtn">
+                                <i class="fa-solid fa-arrow-rotate-left"></i>
+                                <span data-i18n="reset">Zurücksetzen</span>
                             </button>
-                            <input type="checkbox" id="optAuto">
-                            <span class="toggle-track" aria-hidden="true"></span>
-                        </label>
+                            <button type="submit" class="btn btn-solid">
+                                <span data-i18n="calculate">Berechnen</span>
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </form>
+                </section>
+
+                <!-- ── OUTPUT ── -->
+                <section class="card card-output" id="resultSection" aria-labelledby="resultsHeading">
+                    <div class="card-head">
+                        <span class="card-num">02</span>
+                        <h2 class="card-title" id="resultsHeading" data-i18n="results">Ergebnisse</h2>
                     </div>
 
-                    <div class="meter" id="savingsBarContainer">
-                        <div class="meter-head">
-                            <span data-i18n="totalOptimization">Gesamtoptimierung</span>
-                            <strong id="savingsBarPercent">0 %</strong>
+                    <!-- Placeholder -->
+                    <div class="empty" id="resultsPlaceholder">
+                        <div class="empty-graphic">
+                            <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+                                <circle cx="32" cy="32" r="30" stroke="currentColor" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.4"/>
+                                <path d="M20 40V28l12-8 12 8v12l-12-6-12 6z" fill="currentColor" opacity="0.15"/>
+                                <path d="M20 40V28l12-8 12 8v12l-12-6-12 6z" stroke="currentColor" stroke-width="1.5" opacity="0.5"/>
+                            </svg>
                         </div>
-                        <div class="meter-track">
-                            <div class="meter-fill" id="savingsBarFill"></div>
-                        </div>
+                        <p class="empty-title" data-i18n="placeholderTitle">Aktivieren Sie Optimierungen</p>
+                        <p class="empty-sub" data-i18n="placeholderSub">Die Ergebnisse werden in Echtzeit berechnet</p>
                     </div>
 
-                    <div class="actions">
-                        <button type="button" class="btn btn--ghost" id="resetBtn">
-                            <span data-i18n="reset">Zurücksetzen</span>
-                        </button>
-                        <button type="submit" class="btn btn--solid">
-                            <span data-i18n="calculate">Berechnen</span>
-                            <i class="fa-solid fa-arrow-right"></i>
-                        </button>
+                    <!-- Results -->
+                    <div id="results-content" class="hidden">
+                        <div class="savings" id="heroMetric"></div>
+                        <div class="data-strip" id="metricsRow"></div>
+                        <div class="charts-area">
+                            <div class="chart-block">
+                                <div class="chart-label" data-i18n="chartLabel">CHF / Jahr</div>
+                                <canvas id="barChart"></canvas>
+                            </div>
+                            <div class="chart-block chart-block-sm">
+                                <div class="chart-label" data-i18n="breakdown">Aufschlüsselung</div>
+                                <canvas id="donutChart"></canvas>
+                            </div>
+                        </div>
+                        <div id="detailedResults"></div>
+                        <div id="roiSection"></div>
                     </div>
-                </form>
+                </section>
+            </div>
+
+            <!-- ═══ SANKEY SECTION ═══ -->
+            <section class="card sankey-section hidden" id="sankeySection">
+                <div class="card-head">
+                    <span class="card-num">03</span>
+                    <h2 class="card-title" data-i18n="sankeyTitle">Handover-Analyse — Kritische Pfade</h2>
+                </div>
+                <p class="sankey-desc" data-i18n="sankeyDesc">Diagramm der Datenflüsse vom Handover zur Wartung. Identifiziert Engpässe und Blockierpunkte.</p>
+                <div class="sankey-container" id="sankeyChart"></div>
+                <div class="sankey-legend" id="sankeyLegend"></div>
             </section>
 
-            <!-- ── OUTPUT ── -->
-            <section class="calc-output" id="resultSection" aria-labelledby="resultsHeading">
-                <h2 class="panel-title" id="resultsHeading" data-i18n="results">Ergebnisse</h2>
-
-                <!-- Placeholder -->
-                <div class="empty" id="resultsPlaceholder">
-                    <i class="fa-solid fa-chart-pie empty-icon"></i>
-                    <p class="empty-title" data-i18n="placeholderTitle">Aktivieren Sie Optimierungen</p>
-                    <p class="empty-sub" data-i18n="placeholderSub">Die Ergebnisse werden in Echtzeit berechnet</p>
+            <!-- ═══ DALUX DATA SECTION ═══ -->
+            <section class="card dalux-data-section hidden" id="daluxDataSection">
+                <div class="card-head">
+                    <span class="card-num">04</span>
+                    <h2 class="card-title" data-i18n="daluxDataTitle">Dalux Live-Daten</h2>
                 </div>
-
-                <!-- Results -->
-                <div id="results-content" class="hidden">
-                    <div id="heroMetric"></div>
-                    <div class="data-strip" id="metricsRow"></div>
-                    <div class="charts-area">
-                        <div class="chart-block">
-                            <canvas id="barChart"></canvas>
-                        </div>
-                        <div class="chart-block chart-block--sm">
-                            <canvas id="donutChart"></canvas>
-                        </div>
-                    </div>
-                    <div id="detailedResults"></div>
-                    <div id="roiSection"></div>
-                </div>
+                <div class="dalux-data-grid" id="daluxDataGrid"></div>
             </section>
         </div>
     </main>
 
     <!-- ═══ FOOTER ═══ -->
     <footer class="footer">
-        <p><strong data-i18n="copyright">© 2025–2026 Stoffice / Simone J. Stocker – MAS Real Estate</strong></p>
-        <p data-i18n="disclaimer">Alle Angaben ohne Gewähr. Werte dienen zur Veranschaulichung & Testzwecken.</p>
-        <p class="footer-version" data-i18n="sidebarVersion">v5.0 – CAS These HWZ 2026</p>
+        <div class="wrap">
+            <div class="footer-inner">
+                <strong data-i18n="copyright">© 2025–2026 Stoffice / Simone J. Stocker – MAS Real Estate</strong>
+                <span data-i18n="disclaimer">Alle Angaben ohne Gewähr. Werte dienen zur Veranschaulichung & Testzwecken.</span>
+                <span class="footer-meta" data-i18n="sidebarVersion">v6.0 – CAS These HWZ 2026</span>
+            </div>
+        </div>
     </footer>
 
     <script src="js/app.js"></script>
