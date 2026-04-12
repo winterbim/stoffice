@@ -54,7 +54,7 @@
                     <button class="ibtn" id="exportPdf" aria-label="PDF exportieren">
                         <i class="fa-solid fa-file-arrow-down"></i>
                     </button>
-                    <button class="ibtn" id="daluxConfigToggle" aria-label="Dalux API">
+                    <button class="ibtn ibtn-api" id="daluxConfigToggle" aria-label="Dalux API">
                         <i class="fa-solid fa-plug"></i>
                     </button>
                 </div>
@@ -86,7 +86,7 @@
                                 <p class="dalux-card-sub" data-i18n="daluxFmSub">Facility Management API</p>
                             </div>
                             <span class="dalux-status" id="fmStatus">
-                                <i class="fa-solid fa-circle"></i>
+                                <span class="status-dot"></span>
                                 <span data-i18n="disconnected">Getrennt</span>
                             </span>
                         </div>
@@ -113,13 +113,13 @@
                     <!-- Build API -->
                     <div class="dalux-card">
                         <div class="dalux-card-head">
-                            <span class="dalux-card-icon"><i class="fa-solid fa-helmet-safety"></i></span>
+                            <span class="dalux-card-icon dalux-card-icon--build"><i class="fa-solid fa-helmet-safety"></i></span>
                             <div>
                                 <h4>Dalux Build</h4>
                                 <p class="dalux-card-sub" data-i18n="daluxBuildSub">Field / Handover API</p>
                             </div>
                             <span class="dalux-status" id="buildStatus">
-                                <i class="fa-solid fa-circle"></i>
+                                <span class="status-dot"></span>
                                 <span data-i18n="disconnected">Getrennt</span>
                             </span>
                         </div>
@@ -134,7 +134,7 @@
                         </div>
                         <div class="dalux-field">
                             <label for="daluxBuildUrl" data-i18n="baseUrl">Base URL</label>
-                            <input type="url" id="daluxBuildUrl" value="https://node2.field.dalux.com/service/api" placeholder="https://field.dalux.com/service/api">
+                            <input type="url" id="daluxBuildUrl" value="https://node2.field.dalux.com/service/api" placeholder="https://node2.field.dalux.com/service/api">
                         </div>
                         <button class="btn btn-accent" id="testBuildConnection">
                             <i class="fa-solid fa-bolt"></i>
@@ -161,7 +161,7 @@
             <div class="hero">
                 <div class="eyebrow">
                     <i class="fa-solid fa-cube"></i>
-                    <span>Stoffice v6.0</span>
+                    <span>Stoffice v7.0</span>
                 </div>
                 <h1 class="display" data-i18n="title">Smart Building <em>AI</em></h1>
                 <p class="lede" data-i18n="subtitle">Berechnen Sie Einsparungen durch KI-gestützte Gebäudeautomation</p>
@@ -315,10 +315,11 @@
                     <!-- Placeholder -->
                     <div class="empty" id="resultsPlaceholder">
                         <div class="empty-graphic">
-                            <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
-                                <circle cx="32" cy="32" r="30" stroke="currentColor" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.4"/>
-                                <path d="M20 40V28l12-8 12 8v12l-12-6-12 6z" fill="currentColor" opacity="0.15"/>
-                                <path d="M20 40V28l12-8 12 8v12l-12-6-12 6z" stroke="currentColor" stroke-width="1.5" opacity="0.5"/>
+                            <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+                                <circle cx="40" cy="40" r="38" stroke="currentColor" stroke-width="1" stroke-dasharray="4 4" opacity="0.25"/>
+                                <circle cx="40" cy="40" r="24" stroke="currentColor" stroke-width="1" stroke-dasharray="3 3" opacity="0.15"/>
+                                <path d="M28 50V34l12-10 12 10v16l-12-8-12 8z" fill="currentColor" opacity="0.08"/>
+                                <path d="M28 50V34l12-10 12 10v16l-12-8-12 8z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" opacity="0.35"/>
                             </svg>
                         </div>
                         <p class="empty-title" data-i18n="placeholderTitle">Aktivieren Sie Optimierungen</p>
@@ -371,9 +372,9 @@
     <footer class="footer">
         <div class="wrap">
             <div class="footer-inner">
-                <strong data-i18n="copyright">© 2025–2026 Stoffice / Simone J. Stocker – MAS Real Estate</strong>
+                <strong data-i18n="copyright">&copy; 2025-2026 Stoffice / Simone J. Stocker - MAS Real Estate</strong>
                 <span data-i18n="disclaimer">Alle Angaben ohne Gewähr. Werte dienen zur Veranschaulichung & Testzwecken.</span>
-                <span class="footer-meta" data-i18n="sidebarVersion">v6.0 – CAS These HWZ 2026</span>
+                <span class="footer-meta" data-i18n="sidebarVersion">v7.0 - CAS These HWZ 2026</span>
             </div>
         </div>
     </footer>

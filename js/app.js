@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════
-   STOFFICE v6.0 — Logic + i18n + Dalux API + Sankey
+   STOFFICE v7.0 — Logic + i18n + Dalux API + Sankey
    Smart Building AI Calculator
    ═══════════════════════════════════════════════════════ */
 
@@ -7,7 +7,7 @@
     'use strict';
 
     /* ═══════ i18n DICTIONARIES ═══════ */
-    const I18N = {
+    var I18N = {
         de: {
             title: 'Smart Building <em>AI</em>',
             subtitle: 'Berechnen Sie Einsparungen durch KI-gestützte Gebäudeautomation',
@@ -74,20 +74,20 @@
             testConnection: 'Verbindung testen',
             disconnected: 'Getrennt',
             connected: 'Verbunden',
-            connecting: 'Verbinde…',
+            connecting: 'Verbinde\u2026',
             daluxHint: 'Ihre API-Schlüssel werden nur lokal in Ihrem Browser gespeichert und niemals an unsere Server übertragen.',
             daluxDataTitle: 'Dalux Live-Daten',
 
             // Sankey
-            sankeyTitle: 'Handover-Analyse — Kritische Pfade',
+            sankeyTitle: 'Handover-Analyse \u2014 Kritische Pfade',
             sankeyDesc: 'Diagramm der Datenflüsse vom Handover zur Wartung. Identifiziert Engpässe und Blockierpunkte.',
 
             // Footer
-            copyright: '© 2025–2026 Stoffice / Simone J. Stocker – MAS Real Estate',
+            copyright: '\u00A9 2025\u20132026 Stoffice / Simone J. Stocker \u2013 MAS Real Estate',
             disclaimer: 'Alle Angaben ohne Gewähr. Werte dienen zur Veranschaulichung & Testzwecken.',
-            sidebarVersion: 'v6.0 – CAS These HWZ 2026',
+            sidebarVersion: 'v7.0 \u2013 CAS These HWZ 2026',
             toastReset: 'Formular zurückgesetzt',
-            toastExport: 'Druckvorschau wird geöffnet…',
+            toastExport: 'Druckvorschau wird geöffnet\u2026',
             toastLangDE: 'Sprache: Deutsch',
             toastLangFR: 'Langue : Français',
             toastDarkOn: 'Dark Mode aktiviert',
@@ -96,8 +96,8 @@
 
         fr: {
             title: 'Smart Building <em>IA</em>',
-            subtitle: 'Calculez les économies grâce à l\'automatisation intelligente des bâtiments',
-            inputVariables: 'Variables d\'entrée',
+            subtitle: 'Calculez les \u00E9conomies grâce \u00E0 l\'automatisation intelligente des bâtiments',
+            inputVariables: 'Variables d\'entr\u00E9e',
             daysPerYear: 'Jours ouvrables / an',
             unitDays: 'J',
             incidentsPerDay: 'Incidents / jour',
@@ -105,25 +105,25 @@
             hourlyRate: 'Taux horaire (CHF)',
             costAI: 'Coût de la solution IA (CHF / an)',
             optimizationFactors: 'Facteurs d\'optimisation',
-            digitalTwin: 'Jumeau numérique disponible',
-            digitalTwinTip: 'Un jumeau numérique permet la plus grande amélioration de l\'efficacité grâce à la détection automatisée des erreurs et à la priorisation. Potentiel d\'économie : ~75 %',
-            assetsLinked: 'Équipements dans le jumeau numérique',
-            assetsLinkedTip: 'Liaison des équipements avec le jumeau numérique pour l\'attribution automatique et le suivi d\'état. Potentiel d\'économie : ~10 %',
-            docUpToDate: 'Documentation toujours à jour',
-            docUpToDateTip: 'Une documentation à jour réduit les temps de recherche et les erreurs lors du traitement des incidents. Potentiel d\'économie : ~5 %',
-            autoOrders: 'Création automatisée d\'ordres',
-            autoOrdersTip: 'Création automatique d\'ordres de travail basée sur les incidents détectés. Potentiel d\'économie : ~10 %',
+            digitalTwin: 'Jumeau num\u00E9rique disponible',
+            digitalTwinTip: 'Un jumeau num\u00E9rique permet la plus grande am\u00E9lioration de l\'efficacit\u00E9 grâce \u00E0 la d\u00E9tection automatis\u00E9e des erreurs et \u00E0 la priorisation. Potentiel d\'\u00E9conomie : ~75 %',
+            assetsLinked: '\u00C9quipements dans le jumeau num\u00E9rique',
+            assetsLinkedTip: 'Liaison des \u00E9quipements avec le jumeau num\u00E9rique pour l\'attribution automatique et le suivi d\'\u00E9tat. Potentiel d\'\u00E9conomie : ~10 %',
+            docUpToDate: 'Documentation toujours \u00E0 jour',
+            docUpToDateTip: 'Une documentation \u00E0 jour r\u00E9duit les temps de recherche et les erreurs lors du traitement des incidents. Potentiel d\'\u00E9conomie : ~5 %',
+            autoOrders: 'Cr\u00E9ation automatis\u00E9e d\'ordres',
+            autoOrdersTip: 'Cr\u00E9ation automatique d\'ordres de travail bas\u00E9e sur les incidents d\u00E9tect\u00E9s. Potentiel d\'\u00E9conomie : ~10 %',
             totalOptimization: 'Optimisation totale',
-            reset: 'Réinitialiser',
+            reset: 'R\u00E9initialiser',
             calculate: 'Calculer',
-            results: 'Résultats',
+            results: 'R\u00E9sultats',
             placeholderTitle: 'Activez les optimisations',
-            placeholderSub: 'Les résultats sont calculés en temps réel',
+            placeholderSub: 'Les r\u00E9sultats sont calcul\u00E9s en temps r\u00E9el',
 
-            heroEyebrow: 'Économie nette annuelle',
+            heroEyebrow: '\u00C9conomie nette annuelle',
             currentCosts: 'Coûts actuels',
-            optimizedCosts: 'Coûts optimisés',
-            timeSaved: 'Temps économisé',
+            optimizedCosts: 'Coûts optimis\u00E9s',
+            timeSaved: 'Temps \u00E9conomis\u00E9',
             hoursPerYear: 'h / an',
             hours: 'h',
             workdays: 'jours ouvrables',
@@ -131,14 +131,14 @@
             perYear: '/ an',
 
             chartCurrent: 'Actuel',
-            chartOptimized: 'Optimisé',
+            chartOptimized: 'Optimis\u00E9',
             chartAI: 'Investissement IA',
             chartLabel: 'CHF / an',
 
-            breakdown: 'Ventilation détaillée',
-            digitalTwinFactor: 'Jumeau numérique',
-            assetsLinkedFactor: 'Équipements liés',
-            docFactor: 'Documentation à jour',
+            breakdown: 'Ventilation d\u00E9taill\u00E9e',
+            digitalTwinFactor: 'Jumeau num\u00E9rique',
+            assetsLinkedFactor: '\u00C9quipements li\u00E9s',
+            docFactor: 'Documentation \u00E0 jour',
             autoFactor: 'Ordres automatiques',
             aiInvestment: 'Investissement IA',
 
@@ -146,7 +146,7 @@
             roiLabel: 'RSI',
             paybackPeriod: 'Amortissement',
             investment: 'Investissement',
-            netProfit: 'Bénéfice net',
+            netProfit: 'B\u00E9n\u00E9fice net',
             month: 'mois',
             months: 'mois',
             years: 'ans',
@@ -155,54 +155,54 @@
             daluxTitle: 'Connexion API Dalux',
             daluxFmSub: 'API Facility Management',
             daluxBuildSub: 'API Field / Handover',
-            apiKey: 'Clé API (X-API-KEY)',
+            apiKey: 'Cl\u00E9 API (X-API-KEY)',
             baseUrl: 'URL de base',
             testConnection: 'Tester la connexion',
-            disconnected: 'Déconnecté',
-            connected: 'Connecté',
-            connecting: 'Connexion…',
-            daluxHint: 'Vos clés API sont stockées uniquement dans votre navigateur et ne sont jamais transmises à nos serveurs.',
-            daluxDataTitle: 'Données Dalux en direct',
+            disconnected: 'D\u00E9connect\u00E9',
+            connected: 'Connect\u00E9',
+            connecting: 'Connexion\u2026',
+            daluxHint: 'Vos cl\u00E9s API sont stock\u00E9es uniquement dans votre navigateur et ne sont jamais transmises \u00E0 nos serveurs.',
+            daluxDataTitle: 'Donn\u00E9es Dalux en direct',
 
             // Sankey
-            sankeyTitle: 'Analyse Handover — Chemins critiques',
-            sankeyDesc: 'Diagramme des flux de données du handover à la maintenance. Identifie les goulots d\'étranglement et points bloquants.',
+            sankeyTitle: 'Analyse Handover \u2014 Chemins critiques',
+            sankeyDesc: 'Diagramme des flux de donn\u00E9es du handover \u00E0 la maintenance. Identifie les goulots d\'\u00E9tranglement et points bloquants.',
 
-            copyright: '© 2025–2026 Stoffice / Simone J. Stocker – MAS Real Estate',
-            disclaimer: 'Sans garantie. Les valeurs servent uniquement à des fins d\'illustration et de test.',
-            sidebarVersion: 'v6.0 – CAS Thèse HWZ 2026',
-            toastReset: 'Formulaire réinitialisé',
-            toastExport: 'Aperçu d\'impression en cours…',
+            copyright: '\u00A9 2025\u20132026 Stoffice / Simone J. Stocker \u2013 MAS Real Estate',
+            disclaimer: 'Sans garantie. Les valeurs servent uniquement \u00E0 des fins d\'illustration et de test.',
+            sidebarVersion: 'v7.0 \u2013 CAS Th\u00E8se HWZ 2026',
+            toastReset: 'Formulaire r\u00E9initialis\u00E9',
+            toastExport: 'Aperçu d\'impression en cours\u2026',
             toastLangDE: 'Sprache: Deutsch',
             toastLangFR: 'Langue : Français',
-            toastDarkOn: 'Mode sombre activé',
-            toastDarkOff: 'Mode clair activé',
+            toastDarkOn: 'Mode sombre activ\u00E9',
+            toastDarkOff: 'Mode clair activ\u00E9',
         }
     };
 
     /* ═══════ STATE ═══════ */
-    let currentLang = 'de';
-    let barChart = null;
-    let donutChart = null;
+    var currentLang = 'de';
+    var barChart = null;
+    var donutChart = null;
 
     /* ═══════ OPTIMIZATION MAP ═══════ */
-    const OPT = {
-        optZwilling: { pct: 0.75, key: 'digitalTwinFactor', color: '#00c8aa' },
+    var OPT = {
+        optZwilling: { pct: 0.75, key: 'digitalTwinFactor', color: '#00d4aa' },
         optAssets:   { pct: 0.10, key: 'assetsLinkedFactor', color: '#60a5fa' },
         optDoku:     { pct: 0.05, key: 'docFactor',          color: '#a87ad4' },
         optAuto:     { pct: 0.10, key: 'autoFactor',         color: '#d4a843' },
     };
 
-    const DEFAULTS = {
+    var DEFAULTS = {
         daysPerYear: 250, incidentsPerDay: 30, minutesPerIncident: 48,
         hourlyRate: 85, costAI: 0,
         optZwilling: false, optAssets: false, optDoku: false, optAuto: false,
     };
 
     /* ═══════ DOM ═══════ */
-    const $ = function (s) { return document.querySelector(s); };
-    const $$ = function (s) { return document.querySelectorAll(s); };
-    const D = {};
+    var $ = function (s) { return document.querySelector(s); };
+    var $$ = function (s) { return document.querySelectorAll(s); };
+    var D = {};
 
     function cacheDom() {
         D.form        = $('#calculation-form');
@@ -260,7 +260,7 @@
     }
 
     /* ═══════ i18n ═══════ */
-    function t(k) { return I18N[currentLang]?.[k] ?? I18N.de[k] ?? k; }
+    function t(k) { return I18N[currentLang] && I18N[currentLang][k] ? I18N[currentLang][k] : (I18N.de[k] || k); }
 
     function applyI18n() {
         $$('[data-i18n]').forEach(function (el) {
@@ -304,7 +304,7 @@
 
     function loadTheme() {
         var s = localStorage.getItem('stoffice-theme');
-        if (!s) s = 'dark'; // default dark
+        if (!s) s = 'dark';
         document.documentElement.dataset.theme = s;
         D.darkIcon.className = s === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
     }
@@ -315,7 +315,10 @@
         el.className = 'toast';
         el.innerHTML = '<i class="fa-solid fa-circle-check"></i> ' + msg;
         D.toasts.appendChild(el);
-        setTimeout(function () { el.classList.add('toast-exit'); setTimeout(function () { el.remove(); }, 250); }, 2200);
+        setTimeout(function () {
+            el.classList.add('toast-exit');
+            setTimeout(function () { el.remove(); }, 250);
+        }, 2400);
     }
 
     /* ═══════ TOOLTIP ═══════ */
@@ -327,8 +330,8 @@
         var left = r.left + r.width / 2 - tt.width / 2;
         var top = r.bottom + 8;
         if (left < 8) left = 8;
-        if (left + tt.width > innerWidth - 8) left = innerWidth - tt.width - 8;
-        if (top + tt.height > innerHeight - 8) top = r.top - tt.height - 8;
+        if (left + tt.width > window.innerWidth - 8) left = window.innerWidth - tt.width - 8;
+        if (top + tt.height > window.innerHeight - 8) top = r.top - tt.height - 8;
         D.tooltip.style.left = left + 'px';
         D.tooltip.style.top = top + 'px';
     }
@@ -357,11 +360,11 @@
             var s = localStorage.getItem('stoffice-form');
             if (!s) return;
             var d = JSON.parse(s);
-            ['daysPerYear','incidentsPerDay','minutesPerIncident','hourlyRate','costAI'].forEach(function (k) {
+            ['daysPerYear', 'incidentsPerDay', 'minutesPerIncident', 'hourlyRate', 'costAI'].forEach(function (k) {
                 var el = document.getElementById(k);
                 if (el && d[k] !== undefined) el.value = d[k];
             });
-            ['optZwilling','optAssets','optDoku','optAuto'].forEach(function (k) {
+            ['optZwilling', 'optAssets', 'optDoku', 'optAuto'].forEach(function (k) {
                 var el = document.getElementById(k);
                 if (el && d[k] !== undefined) el.checked = d[k];
             });
@@ -429,7 +432,7 @@
 
         D.exportBtn.addEventListener('click', function () {
             toast(t('toastExport'));
-            setTimeout(function () { print(); }, 350);
+            setTimeout(function () { window.print(); }, 350);
         });
 
         // Language
@@ -443,10 +446,10 @@
             });
         });
 
-        // Toggle rows — click on entire row to toggle checkbox
+        // Toggle rows -- click on entire row to toggle checkbox
         D.toggleRows.forEach(function (row) {
             row.addEventListener('click', function (e) {
-                if (e.target.closest('.info-btn')) return; // don't toggle if clicking info
+                if (e.target.closest('.info-btn')) return;
                 var id = row.dataset.toggle;
                 var cb = document.getElementById(id);
                 if (cb) {
@@ -591,7 +594,7 @@
     /* ═══════ BAR CHART ═══════ */
     function renderBarChart(costNow, costNew, costAI) {
         var dark = document.documentElement.dataset.theme === 'dark';
-        var txt  = dark ? '#8b949e' : '#57606a';
+        var txt  = dark ? '#8b949e' : '#6b7280';
         var grid = dark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.06)';
 
         var canvas = $('#barChart');
@@ -600,15 +603,15 @@
         var labels = [t('chartCurrent'), t('chartOptimized')];
         var data   = [costNow, Math.max(0, costNew)];
         var bg     = [
-            dark ? 'rgba(248,113,113,0.15)' : 'rgba(248,113,113,0.1)',
-            dark ? 'rgba(0,200,170,0.15)' : 'rgba(0,200,170,0.1)'
+            dark ? 'rgba(248,113,113,0.12)' : 'rgba(248,113,113,0.08)',
+            dark ? 'rgba(0,212,170,0.12)' : 'rgba(0,212,170,0.08)'
         ];
-        var border = ['#f87171', '#00c8aa'];
+        var border = ['#f87171', '#00d4aa'];
 
         if (costAI > 0) {
             labels.push(t('chartAI'));
             data.push(costAI);
-            bg.push(dark ? 'rgba(212,168,67,0.15)' : 'rgba(212,168,67,0.1)');
+            bg.push(dark ? 'rgba(212,168,67,0.12)' : 'rgba(212,168,67,0.08)');
             border.push('#d4a843');
         }
 
@@ -619,7 +622,7 @@
                 datasets: [{
                     label: t('chartLabel'), data: data,
                     backgroundColor: bg, borderColor: border,
-                    borderWidth: 2, borderRadius: 6, borderSkipped: false
+                    borderWidth: 2, borderRadius: 8, borderSkipped: false
                 }]
             },
             options: {
@@ -628,9 +631,9 @@
                     legend: { display: false },
                     tooltip: {
                         callbacks: { label: function (c) { return fmtCHF(c.raw); } },
-                        backgroundColor: dark ? '#1b2530' : '#fff',
+                        backgroundColor: dark ? '#1c2436' : '#fff',
                         titleColor: txt, bodyColor: txt,
-                        borderColor: dark ? '#22303e' : '#e4e8ec', borderWidth: 1, padding: 12,
+                        borderColor: dark ? '#253044' : '#e5e7eb', borderWidth: 1, padding: 12,
                         titleFont: { family: 'Inter', weight: '700', size: 12 },
                         bodyFont:  { family: 'Inter', size: 12 },
                         cornerRadius: 8,
@@ -654,7 +657,7 @@
     /* ═══════ DONUT CHART ═══════ */
     function renderDonut(active, costNow) {
         var dark = document.documentElement.dataset.theme === 'dark';
-        var txt  = dark ? '#8b949e' : '#57606a';
+        var txt  = dark ? '#8b949e' : '#6b7280';
 
         var canvas = $('#donutChart');
         if (donutChart) donutChart.destroy();
@@ -669,13 +672,13 @@
                 labels: labels,
                 datasets: [{
                     data: data,
-                    backgroundColor: colors.map(function (c) { return c + (dark ? '30' : '20'); }),
+                    backgroundColor: colors.map(function (c) { return c + (dark ? '25' : '18'); }),
                     borderColor: colors,
                     borderWidth: 2, hoverOffset: 6
                 }]
             },
             options: {
-                responsive: true, maintainAspectRatio: true, cutout: '65%',
+                responsive: true, maintainAspectRatio: true, cutout: '68%',
                 plugins: {
                     legend: {
                         position: 'bottom',
@@ -686,9 +689,9 @@
                     },
                     tooltip: {
                         callbacks: { label: function (c) { return c.label + ': ' + fmtCHF(c.raw); } },
-                        backgroundColor: dark ? '#1b2530' : '#fff',
+                        backgroundColor: dark ? '#1c2436' : '#fff',
                         titleColor: txt, bodyColor: txt,
-                        borderColor: dark ? '#22303e' : '#e4e8ec', borderWidth: 1, padding: 12,
+                        borderColor: dark ? '#253044' : '#e5e7eb', borderWidth: 1, padding: 12,
                         cornerRadius: 8,
                     }
                 },
@@ -702,15 +705,15 @@
         var html = '<h3 class="breakdown-title">' + t('breakdown') + '</h3>';
         active.forEach(function (s, i) {
             var amt = costNow * s.pct;
-            html += '<div class="breakdown-row" style="animation-delay:' + (i * 50) + 'ms">' +
+            html += '<div class="breakdown-row" style="animation-delay:' + (i * 60) + 'ms">' +
                 '<span class="breakdown-left">' + t(s.key) + ' (' + Math.round(s.pct * 100) + ' %)</span>' +
                 '<span class="breakdown-right pos">+ ' + fmtCHF(amt) + '</span>' +
             '</div>';
         });
         if (costAI > 0) {
-            html += '<div class="breakdown-row" style="animation-delay:' + (active.length * 50) + 'ms">' +
+            html += '<div class="breakdown-row" style="animation-delay:' + (active.length * 60) + 'ms">' +
                 '<span class="breakdown-left">' + t('aiInvestment') + '</span>' +
-                '<span class="breakdown-right neg">− ' + fmtCHF(costAI) + '</span>' +
+                '<span class="breakdown-right neg">\u2212 ' + fmtCHF(costAI) + '</span>' +
             '</div>';
         }
         D.detailed.innerHTML = html;
@@ -746,6 +749,17 @@
         D.sankeySection.classList.add('hidden');
     }
 
+    // Sankey tooltip element (created once)
+    var sankeyTip = null;
+    function getSankeyTip() {
+        if (!sankeyTip) {
+            sankeyTip = document.createElement('div');
+            sankeyTip.className = 'sankey-tooltip';
+            document.body.appendChild(sankeyTip);
+        }
+        return sankeyTip;
+    }
+
     function renderSankey(active, costNow) {
         D.sankeySection.classList.remove('hidden');
 
@@ -754,16 +768,17 @@
         D.sankeyLegend.innerHTML = '';
 
         var width = D.sankeyChart.clientWidth - 40;
-        var height = 400;
+        var height = 420;
+        if (width < 300) width = 300;
 
-        // Build Sankey data: Handover → Factors → Impact
+        // Build Sankey data: Handover -> Factors -> Impact
         var nodes = [
             { id: 'handover',   name: currentLang === 'fr' ? 'Handover Dalux' : 'Handover Dalux' },
             { id: 'dtwin',      name: t('digitalTwinFactor') },
             { id: 'assets',     name: t('assetsLinkedFactor') },
             { id: 'docs',       name: t('docFactor') },
             { id: 'automation', name: t('autoFactor') },
-            { id: 'savings',    name: currentLang === 'fr' ? 'Économies réalisées' : 'Realisierte Einsparungen' },
+            { id: 'savings',    name: currentLang === 'fr' ? '\u00C9conomies r\u00E9alis\u00E9es' : 'Realisierte Einsparungen' },
             { id: 'remaining',  name: currentLang === 'fr' ? 'Coûts restants' : 'Verbleibende Kosten' },
             { id: 'blocked',    name: currentLang === 'fr' ? 'Points bloquants' : 'Blockierpunkte' },
         ];
@@ -797,9 +812,8 @@
             links.push({ source: 'handover', target: 'remaining', value: inactiveTotal });
         }
 
-        // Add base remaining cost (non-optimizable)
         // Always show some flow to remaining
-        if (links.filter(function(l) { return l.target === 'remaining'; }).length === 0) {
+        if (links.filter(function (l) { return l.target === 'remaining'; }).length === 0) {
             links.push({ source: 'handover', target: 'remaining', value: costNow * 0.01 });
         }
 
@@ -813,14 +827,16 @@
         // Colors for nodes
         var nodeColors = {
             handover: '#60a5fa',
-            dtwin: '#00c8aa',
+            dtwin: '#00d4aa',
             assets: '#60a5fa',
             docs: '#a87ad4',
             automation: '#d4a843',
-            savings: '#2dd4a0',
+            savings: '#34d399',
             remaining: '#f87171',
-            blocked: '#f0b429',
+            blocked: '#fbbf24',
         };
+
+        var dark = document.documentElement.dataset.theme === 'dark';
 
         // D3 Sankey
         var svg = d3.select(D.sankeyChart)
@@ -830,9 +846,12 @@
             .append('g')
             .attr('transform', 'translate(20,10)');
 
+        // Define gradients
+        var defs = svg.append('defs');
+
         var sankey = d3.sankey()
-            .nodeWidth(20)
-            .nodePadding(16)
+            .nodeWidth(22)
+            .nodePadding(18)
             .nodeAlign(d3.sankeyLeft)
             .extent([[0, 0], [width, height]]);
 
@@ -843,7 +862,25 @@
             })
         });
 
-        // Links
+        // Create gradient for each link
+        graph.links.forEach(function (d, i) {
+            var gradientId = 'linkGrad' + i;
+            var srcColor = nodeColors[nodes[d.source.index].id] || '#8b949e';
+            var tgtColor = nodeColors[nodes[d.target.index].id] || '#8b949e';
+
+            var gradient = defs.append('linearGradient')
+                .attr('id', gradientId)
+                .attr('gradientUnits', 'userSpaceOnUse')
+                .attr('x1', d.source.x1)
+                .attr('x2', d.target.x0);
+
+            gradient.append('stop').attr('offset', '0%').attr('stop-color', srcColor).attr('stop-opacity', 0.5);
+            gradient.append('stop').attr('offset', '100%').attr('stop-color', tgtColor).attr('stop-opacity', 0.5);
+        });
+
+        // Links with gradient
+        var tip = getSankeyTip();
+
         var link = svg.append('g')
             .selectAll('.sankey-link')
             .data(graph.links)
@@ -851,19 +888,28 @@
             .attr('class', 'sankey-link')
             .attr('d', d3.sankeyLinkHorizontal())
             .attr('fill', 'none')
-            .attr('stroke', function (d) { return nodeColors[nodes[d.source.index].id] || '#8b949e'; })
-            .attr('stroke-opacity', 0.3)
+            .attr('stroke', function (d, i) { return 'url(#linkGrad' + i + ')'; })
+            .attr('stroke-opacity', 0.4)
             .attr('stroke-width', function (d) { return Math.max(2, d.width); })
-            .style('transition', 'stroke-opacity 0.25s ease');
+            .style('transition', 'stroke-opacity 0.25s ease')
+            .style('cursor', 'pointer');
 
-        link.on('mouseenter', function () { d3.select(this).attr('stroke-opacity', 0.6); })
-            .on('mouseleave', function () { d3.select(this).attr('stroke-opacity', 0.3); });
-
-        // Link tooltips
-        link.append('title')
-            .text(function (d) {
-                return nodes[d.source.index].name + ' → ' + nodes[d.target.index].name + ': ' + fmtCHF(d.value);
-            });
+        link.on('mouseenter', function (event, d) {
+            d3.select(this).attr('stroke-opacity', 0.7);
+            var srcName = nodes[d.source.index].name;
+            var tgtName = nodes[d.target.index].name;
+            tip.innerHTML = '<div class="sankey-tooltip-title">' + srcName + ' \u2192 ' + tgtName + '</div>' +
+                '<div class="sankey-tooltip-value">' + fmtCHF(d.value) + '</div>';
+            tip.classList.add('visible');
+        })
+        .on('mousemove', function (event) {
+            tip.style.left = (event.clientX + 14) + 'px';
+            tip.style.top = (event.clientY - 10) + 'px';
+        })
+        .on('mouseleave', function () {
+            d3.select(this).attr('stroke-opacity', 0.4);
+            tip.classList.remove('visible');
+        });
 
         // Nodes
         var node = svg.append('g')
@@ -872,6 +918,13 @@
             .join('g')
             .attr('class', 'sankey-node');
 
+        // Node glow filter
+        var glowFilter = defs.append('filter').attr('id', 'nodeGlow');
+        glowFilter.append('feGaussianBlur').attr('stdDeviation', '3').attr('result', 'blur');
+        var feMerge = glowFilter.append('feMerge');
+        feMerge.append('feMergeNode').attr('in', 'blur');
+        feMerge.append('feMergeNode').attr('in', 'SourceGraphic');
+
         node.append('rect')
             .attr('x', function (d) { return d.x0; })
             .attr('y', function (d) { return d.y0; })
@@ -879,17 +932,31 @@
             .attr('width', sankey.nodeWidth())
             .attr('fill', function (d) { return nodeColors[nodes[d.index].id] || '#8b949e'; })
             .attr('rx', 4)
-            .attr('opacity', 0.9);
+            .attr('opacity', 0.9)
+            .attr('filter', 'url(#nodeGlow)')
+            .style('cursor', 'pointer');
+
+        // Node hover tooltip
+        node.on('mouseenter', function (event, d) {
+            tip.innerHTML = '<div class="sankey-tooltip-title">' + d.name + '</div>' +
+                '<div class="sankey-tooltip-value">' + fmtCHF(d.value) + '</div>';
+            tip.classList.add('visible');
+        })
+        .on('mousemove', function (event) {
+            tip.style.left = (event.clientX + 14) + 'px';
+            tip.style.top = (event.clientY - 10) + 'px';
+        })
+        .on('mouseleave', function () {
+            tip.classList.remove('visible');
+        });
 
         // Node labels
         node.append('text')
-            .attr('x', function (d) { return d.x0 < width / 2 ? d.x1 + 8 : d.x0 - 8; })
+            .attr('x', function (d) { return d.x0 < width / 2 ? d.x1 + 10 : d.x0 - 10; })
             .attr('y', function (d) { return (d.y1 + d.y0) / 2; })
             .attr('dy', '0.35em')
             .attr('text-anchor', function (d) { return d.x0 < width / 2 ? 'start' : 'end'; })
-            .attr('fill', function () {
-                return document.documentElement.dataset.theme === 'dark' ? '#c9d1d9' : '#24292f';
-            })
+            .attr('fill', dark ? '#c9d1d9' : '#1f2937')
             .attr('font-size', '12px')
             .attr('font-family', 'Inter, sans-serif')
             .attr('font-weight', '600')
@@ -897,22 +964,21 @@
 
         // Node value labels
         node.append('text')
-            .attr('x', function (d) { return d.x0 < width / 2 ? d.x1 + 8 : d.x0 - 8; })
-            .attr('y', function (d) { return (d.y1 + d.y0) / 2 + 16; })
+            .attr('x', function (d) { return d.x0 < width / 2 ? d.x1 + 10 : d.x0 - 10; })
+            .attr('y', function (d) { return (d.y1 + d.y0) / 2 + 17; })
             .attr('text-anchor', function (d) { return d.x0 < width / 2 ? 'start' : 'end'; })
-            .attr('fill', function () {
-                return document.documentElement.dataset.theme === 'dark' ? '#8b949e' : '#57606a';
-            })
-            .attr('font-size', '10px')
-            .attr('font-family', 'JetBrains Mono, monospace')
+            .attr('fill', dark ? '#8b949e' : '#6b7280')
+            .attr('font-size', '11px')
+            .attr('font-family', 'Inter, monospace')
+            .attr('font-weight', '500')
             .text(function (d) { return d.value > 0 ? fmtCHF(d.value) : ''; });
 
         // Legend
         var legendItems = [
             { color: '#60a5fa', label: 'Handover Dalux' },
-            { color: '#00c8aa', label: t('digitalTwinFactor') },
-            { color: '#2dd4a0', label: currentLang === 'fr' ? 'Économies' : 'Einsparungen' },
-            { color: '#f0b429', label: currentLang === 'fr' ? 'Points bloquants' : 'Blockierpunkte' },
+            { color: '#00d4aa', label: t('digitalTwinFactor') },
+            { color: '#34d399', label: currentLang === 'fr' ? '\u00C9conomies' : 'Einsparungen' },
+            { color: '#fbbf24', label: currentLang === 'fr' ? 'Points bloquants' : 'Blockierpunkte' },
             { color: '#f87171', label: currentLang === 'fr' ? 'Coûts restants' : 'Verbleibende Kosten' },
         ];
 
@@ -929,6 +995,7 @@
        DALUX API CONNECTION (via Vercel proxy)
        ═══════════════════════════════════ */
     var PROXY_URL = '/api/dalux/proxy';
+    var BUILD_DEFAULT_URL = 'https://node2.field.dalux.com/service/api';
 
     function daluxFetch(apiKey, baseUrl, endpoint) {
         return fetch(PROXY_URL, {
@@ -963,7 +1030,22 @@
             if (c.fmKey) D.fmKey.value = c.fmKey;
             if (c.fmUrl) D.fmUrl.value = c.fmUrl;
             if (c.buildKey) D.buildKey.value = c.buildKey;
-            if (c.buildUrl) D.buildUrl.value = c.buildUrl;
+
+            // CRITICAL: Migrate old field.dalux.com URLs to node2.field.dalux.com
+            if (c.buildUrl) {
+                var migrated = c.buildUrl.replace(
+                    /https?:\/\/field\.dalux\.com\/service\/api/i,
+                    BUILD_DEFAULT_URL
+                );
+                D.buildUrl.value = migrated;
+                // Persist the migration
+                if (migrated !== c.buildUrl) {
+                    c.buildUrl = migrated;
+                    localStorage.setItem('stoffice-dalux', JSON.stringify(c));
+                }
+            } else {
+                D.buildUrl.value = BUILD_DEFAULT_URL;
+            }
         } catch (e) { /* ignore */ }
     }
 
@@ -985,7 +1067,7 @@
         }
 
         if (!key) {
-            showDaluxResult(resultEl, 'error', currentLang === 'fr' ? 'Veuillez saisir une clé API' : 'Bitte geben Sie einen API-Schlüssel ein');
+            showDaluxResult(resultEl, 'error', currentLang === 'fr' ? 'Veuillez saisir une cl\u00E9 API' : 'Bitte geben Sie einen API-Schlüssel ein');
             return;
         }
 
@@ -995,14 +1077,14 @@
 
         daluxFetch(key, url, endpoint)
             .then(function (data) {
-                statusEl.innerHTML = '<i class="fa-solid fa-circle"></i> <span>' + t('connected') + '</span>';
+                statusEl.innerHTML = '<span class="status-dot"></span> <span>' + t('connected') + '</span>';
                 statusEl.className = 'dalux-status connected';
 
                 var count = extractCount(data);
 
                 var msg = type === 'fm'
-                    ? (currentLang === 'fr' ? 'Connecté ! ' + count + ' bâtiment(s) trouvé(s).' : 'Verbunden! ' + count + ' Gebäude gefunden.')
-                    : (currentLang === 'fr' ? 'Connecté ! ' + count + ' projet(s) trouvé(s).' : 'Verbunden! ' + count + ' Projekt(e) gefunden.');
+                    ? (currentLang === 'fr' ? 'Connect\u00E9 ! ' + count + ' bâtiment(s) trouv\u00E9(s).' : 'Verbunden! ' + count + ' Gebäude gefunden.')
+                    : (currentLang === 'fr' ? 'Connect\u00E9 ! ' + count + ' projet(s) trouv\u00E9(s).' : 'Verbunden! ' + count + ' Projekt(e) gefunden.');
 
                 showDaluxResult(resultEl, 'success', msg);
                 toast(msg);
@@ -1015,14 +1097,14 @@
                 }
             })
             .catch(function (err) {
-                statusEl.innerHTML = '<i class="fa-solid fa-circle"></i> <span>' + t('disconnected') + '</span>';
+                statusEl.innerHTML = '<span class="status-dot"></span> <span>' + t('disconnected') + '</span>';
                 statusEl.className = 'dalux-status';
 
                 var errMsg = err.message;
-                if (errMsg.includes('Failed to fetch') || errMsg.includes('NetworkError')) {
+                if (errMsg.indexOf('Failed to fetch') !== -1 || errMsg.indexOf('NetworkError') !== -1) {
                     errMsg = currentLang === 'fr'
-                        ? 'Erreur réseau — le proxy serverless est peut-être indisponible.'
-                        : 'Netzwerkfehler — der Serverless-Proxy ist möglicherweise nicht verfügbar.';
+                        ? 'Erreur r\u00E9seau \u2014 le proxy serverless est peut-être indisponible.'
+                        : 'Netzwerkfehler \u2014 der Serverless-Proxy ist möglicherweise nicht verfügbar.';
                 }
                 showDaluxResult(resultEl, 'error', errMsg);
             });
@@ -1060,25 +1142,25 @@
     /* ═══════ LOAD DALUX FM DATA ═══════ */
     function loadDaluxFmData(key, url) {
         D.daluxDataSection.classList.remove('hidden');
-        D.daluxDataGrid.innerHTML = '<div class="dalux-stat-card"><p style="color:var(--text-2)"><i class="fa-solid fa-spinner fa-spin"></i> ' + (currentLang === 'fr' ? 'Chargement des données…' : 'Daten werden geladen…') + '</p></div>';
+        D.daluxDataGrid.innerHTML = '<div class="dalux-stat-card"><p style="color:var(--text-2)"><i class="fa-solid fa-spinner fa-spin"></i> ' + (currentLang === 'fr' ? 'Chargement des donn\u00E9es\u2026' : 'Daten werden geladen\u2026') + '</p></div>';
 
         var stats = { buildings: 0, assets: 0, workorders: 0, tickets: 0 };
 
         var fetchBuildings = daluxFetch(key, url, '2.0/buildings')
             .then(function (d) { stats.buildings = extractCount(d); })
-            .catch(function () { stats.buildings = '—'; });
+            .catch(function () { stats.buildings = '\u2014'; });
 
         var fetchWO = daluxFetch(key, url, '2.2/workorders')
             .then(function (d) { stats.workorders = extractCount(d); })
-            .catch(function () { stats.workorders = '—'; });
+            .catch(function () { stats.workorders = '\u2014'; });
 
         var fetchAssets = daluxFetch(key, url, '2.0/assets')
             .then(function (d) { stats.assets = extractCount(d); })
-            .catch(function () { stats.assets = '—'; });
+            .catch(function () { stats.assets = '\u2014'; });
 
         var fetchTickets = daluxFetch(key, url, '2.0/tickets')
             .then(function (d) { stats.tickets = extractCount(d); })
-            .catch(function () { stats.tickets = '—'; });
+            .catch(function () { stats.tickets = '\u2014'; });
 
         Promise.all([fetchBuildings, fetchWO, fetchAssets, fetchTickets]).then(function () {
             renderDaluxData(stats);
@@ -1089,7 +1171,6 @@
     function loadDaluxBuildData(_key, _url, projectsData) {
         D.daluxDataSection.classList.remove('hidden');
 
-        // Extract projects from Dalux Build wrapped response
         var projects = extractBuildProjects(projectsData);
 
         var stats = {
@@ -1099,7 +1180,6 @@
             companies: 0,
         };
 
-        // Don't auto-fetch sub-data — just show projects list
         renderBuildData(stats, projects);
     }
 
@@ -1108,7 +1188,7 @@
             {
                 icon: 'fa-building',
                 color: '--info',
-                bg: 'rgba(96,165,250,0.1)',
+                bg: 'rgba(96,165,250,0.08)',
                 value: stats.buildings,
                 label: currentLang === 'fr' ? 'Bâtiments' : 'Gebäude',
                 sub: 'DALUX FM'
@@ -1116,15 +1196,15 @@
             {
                 icon: 'fa-cube',
                 color: '--accent',
-                bg: 'rgba(0,200,170,0.1)',
+                bg: 'rgba(0,212,170,0.08)',
                 value: stats.assets,
-                label: currentLang === 'fr' ? 'Équipements' : 'Anlagen',
+                label: currentLang === 'fr' ? '\u00C9quipements' : 'Anlagen',
                 sub: 'ASSETS'
             },
             {
                 icon: 'fa-wrench',
                 color: '--gold',
-                bg: 'rgba(212,168,67,0.1)',
+                bg: 'rgba(212,168,67,0.08)',
                 value: stats.workorders,
                 label: currentLang === 'fr' ? 'Ordres de travail' : 'Arbeitsaufträge',
                 sub: 'WORK ORDERS'
@@ -1132,7 +1212,7 @@
             {
                 icon: 'fa-ticket',
                 color: '--coral',
-                bg: 'rgba(232,115,90,0.1)',
+                bg: 'rgba(232,115,90,0.08)',
                 value: stats.tickets,
                 label: currentLang === 'fr' ? 'Tickets' : 'Tickets',
                 sub: 'TICKETS'
@@ -1140,8 +1220,8 @@
         ];
 
         var html = '';
-        cards.forEach(function (c) {
-            html += '<div class="dalux-stat-card">' +
+        cards.forEach(function (c, i) {
+            html += '<div class="dalux-stat-card" style="animation-delay:' + (i * 80) + 'ms">' +
                 '<div class="dalux-stat-icon" style="background:' + c.bg + ';color:var(' + c.color + ')">' +
                     '<i class="fa-solid ' + c.icon + '"></i>' +
                 '</div>' +
@@ -1159,7 +1239,7 @@
             {
                 icon: 'fa-helmet-safety',
                 color: '--info',
-                bg: 'rgba(96,165,250,0.1)',
+                bg: 'rgba(96,165,250,0.08)',
                 value: stats.projects,
                 label: currentLang === 'fr' ? 'Projets' : 'Projekte',
                 sub: 'DALUX BUILD'
@@ -1167,7 +1247,7 @@
             {
                 icon: 'fa-list-check',
                 color: '--accent',
-                bg: 'rgba(0,200,170,0.1)',
+                bg: 'rgba(0,212,170,0.08)',
                 value: stats.tasks,
                 label: currentLang === 'fr' ? 'Tâches Field' : 'Field-Aufgaben',
                 sub: 'TASKS'
@@ -1175,7 +1255,7 @@
             {
                 icon: 'fa-file-lines',
                 color: '--plum',
-                bg: 'rgba(168,122,212,0.1)',
+                bg: 'rgba(168,122,212,0.08)',
                 value: stats.forms,
                 label: currentLang === 'fr' ? 'Formulaires' : 'Formulare',
                 sub: 'FORMS'
@@ -1183,7 +1263,7 @@
             {
                 icon: 'fa-building-user',
                 color: '--gold',
-                bg: 'rgba(212,168,67,0.1)',
+                bg: 'rgba(212,168,67,0.08)',
                 value: stats.companies,
                 label: currentLang === 'fr' ? 'Mandataires' : 'Mandanten',
                 sub: 'COMPANIES'
@@ -1191,8 +1271,8 @@
         ];
 
         var html = '';
-        cards.forEach(function (c) {
-            html += '<div class="dalux-stat-card">' +
+        cards.forEach(function (c, i) {
+            html += '<div class="dalux-stat-card" style="animation-delay:' + (i * 80) + 'ms">' +
                 '<div class="dalux-stat-icon" style="background:' + c.bg + ';color:var(' + c.color + ')">' +
                     '<i class="fa-solid ' + c.icon + '"></i>' +
                 '</div>' +
@@ -1205,30 +1285,30 @@
         // Project list
         if (projects.length > 0) {
             html += '<div class="dalux-stat-card" style="grid-column: 1 / -1">' +
-                '<div class="dalux-stat-icon" style="background:rgba(0,200,170,0.1);color:var(--accent)">' +
+                '<div class="dalux-stat-icon" style="background:rgba(0,212,170,0.08);color:var(--accent)">' +
                     '<i class="fa-solid fa-folder-open"></i>' +
                 '</div>' +
-                '<div class="dalux-stat-label" style="margin-bottom:8px">' + (currentLang === 'fr' ? 'Projets disponibles' : 'Verfügbare Projekte') + '</div>';
+                '<div class="dalux-stat-label" style="margin-bottom:8px;font-size:1.5rem">' + (currentLang === 'fr' ? 'Projets disponibles' : 'Verfügbare Projekte') + '</div>';
 
             projects.slice(0, 10).forEach(function (p) {
-                var name = p.projectName || p.name || '—';
+                var name = p.projectName || p.name || '\u2014';
                 var id = p.projectId || p.id || '';
                 var addr = p.address || '';
                 var modules = (p.modules || []).map(function (m) { return m.type; }).join(', ');
-                html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--glass-border);font-size:1.3rem;gap:8px">' +
+                html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--glass-border);font-size:1.3rem;gap:12px">' +
                     '<div style="flex:1;min-width:0">' +
-                        '<div style="color:var(--text-1);font-weight:500">' + name + '</div>' +
-                        (addr ? '<div style="font-size:1.1rem;color:var(--text-3)">' + addr + '</div>' : '') +
+                        '<div style="color:var(--text-0);font-weight:600">' + name + '</div>' +
+                        (addr ? '<div style="font-size:1.15rem;color:var(--text-3);margin-top:2px">' + addr + '</div>' : '') +
                     '</div>' +
                     '<div style="text-align:right;flex-shrink:0">' +
                         '<div style="font-family:var(--mono);font-size:1.05rem;color:var(--text-3)">' + id + '</div>' +
-                        (modules ? '<div style="font-size:1rem;color:var(--accent)">' + modules + '</div>' : '') +
+                        (modules ? '<div style="font-size:1rem;color:var(--accent);margin-top:2px">' + modules + '</div>' : '') +
                     '</div>' +
                 '</div>';
             });
 
             if (projects.length > 10) {
-                html += '<div style="padding-top:8px;font-size:1.2rem;color:var(--text-3)">+ ' + (projects.length - 10) + (currentLang === 'fr' ? ' autres projets…' : ' weitere Projekte…') + '</div>';
+                html += '<div style="padding-top:10px;font-size:1.2rem;color:var(--text-3)">+ ' + (projects.length - 10) + (currentLang === 'fr' ? ' autres projets\u2026' : ' weitere Projekte\u2026') + '</div>';
             }
             html += '</div>';
         }
