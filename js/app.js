@@ -981,7 +981,7 @@
             url = D.buildUrl.value.trim();
             statusEl = D.buildStatus;
             resultEl = D.buildResult;
-            endpoint = '5.0/projects';
+            endpoint = '5.1/projects';
         }
 
         if (!key) {
@@ -1028,11 +1028,27 @@
             });
     }
 
+    /**
+     * Extract item count from Dalux API responses.
+     * Build API wraps items: { items: [{ data: {...} }], metadata: { totalItems } }
+     * FM API returns: { items: [...] } or flat arrays
+     */
     function extractCount(data) {
-        if (Array.isArray(data)) return data.length;
+        if (data && data.metadata && data.metadata.totalItems) return data.metadata.totalItems;
         if (data && data.items) return data.items.length;
-        if (data && data.data) return data.data.length;
+        if (Array.isArray(data)) return data.length;
         return 0;
+    }
+
+    /**
+     * Extract project list from Dalux Build API response.
+     * Response format: { items: [{ data: { projectId, projectName, ... } }] }
+     */
+    function extractBuildProjects(data) {
+        if (!data || !data.items) return [];
+        return data.items.map(function (item) {
+            return item.data || item;
+        });
     }
 
     function showDaluxResult(el, type, msg) {
@@ -1070,13 +1086,11 @@
     }
 
     /* ═══════ LOAD DALUX BUILD DATA ═══════ */
-    function loadDaluxBuildData(key, url, projectsData) {
+    function loadDaluxBuildData(_key, _url, projectsData) {
         D.daluxDataSection.classList.remove('hidden');
 
-        var projects = [];
-        if (Array.isArray(projectsData)) projects = projectsData;
-        else if (projectsData && projectsData.items) projects = projectsData.items;
-        else if (projectsData && projectsData.data) projects = projectsData.data;
+        // Extract projects from Dalux Build wrapped response
+        var projects = extractBuildProjects(projectsData);
 
         var stats = {
             projects: projects.length,
@@ -1085,28 +1099,8 @@
             companies: 0,
         };
 
-        // If we have projects, fetch details from the first one
-        if (projects.length > 0) {
-            var pid = projects[0].projectId || projects[0].id || projects[0].Id;
-
-            var fetchTasks = pid ? daluxFetch(key, url, '5.2/projects/' + pid + '/tasks')
-                .then(function (d) { stats.tasks = extractCount(d); })
-                .catch(function () { stats.tasks = '—'; }) : Promise.resolve();
-
-            var fetchForms = pid ? daluxFetch(key, url, '2.2/projects/' + pid + '/forms')
-                .then(function (d) { stats.forms = extractCount(d); })
-                .catch(function () { stats.forms = '—'; }) : Promise.resolve();
-
-            var fetchCompanies = pid ? daluxFetch(key, url, '3.1/projects/' + pid + '/companies')
-                .then(function (d) { stats.companies = extractCount(d); })
-                .catch(function () { stats.companies = '—'; }) : Promise.resolve();
-
-            Promise.all([fetchTasks, fetchForms, fetchCompanies]).then(function () {
-                renderBuildData(stats, projects);
-            });
-        } else {
-            renderBuildData(stats, []);
-        }
+        // Don't auto-fetch sub-data — just show projects list
+        renderBuildData(stats, projects);
     }
 
     function renderDaluxData(stats) {
@@ -1217,11 +1211,19 @@
                 '<div class="dalux-stat-label" style="margin-bottom:8px">' + (currentLang === 'fr' ? 'Projets disponibles' : 'Verfügbare Projekte') + '</div>';
 
             projects.slice(0, 10).forEach(function (p) {
-                var name = p.name || p.Name || p.projectName || '—';
-                var id = p.projectId || p.id || p.Id || '';
-                html += '<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--glass-border);font-size:1.3rem">' +
-                    '<span style="color:var(--text-1)">' + name + '</span>' +
-                    '<span style="font-family:var(--mono);font-size:1.1rem;color:var(--text-3)">' + id + '</span>' +
+                var name = p.projectName || p.name || '—';
+                var id = p.projectId || p.id || '';
+                var addr = p.address || '';
+                var modules = (p.modules || []).map(function (m) { return m.type; }).join(', ');
+                html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--glass-border);font-size:1.3rem;gap:8px">' +
+                    '<div style="flex:1;min-width:0">' +
+                        '<div style="color:var(--text-1);font-weight:500">' + name + '</div>' +
+                        (addr ? '<div style="font-size:1.1rem;color:var(--text-3)">' + addr + '</div>' : '') +
+                    '</div>' +
+                    '<div style="text-align:right;flex-shrink:0">' +
+                        '<div style="font-family:var(--mono);font-size:1.05rem;color:var(--text-3)">' + id + '</div>' +
+                        (modules ? '<div style="font-size:1rem;color:var(--accent)">' + modules + '</div>' : '') +
+                    '</div>' +
                 '</div>';
             });
 
