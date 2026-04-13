@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useMemo, useRef } from 'react';
+import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { flushSync } from 'react-dom';
 import { calculate, formatCHF, DEFAULTS, type CalculatorInputs } from '@/lib/calculator';
 import { t, type Locale } from '@/lib/i18n';
@@ -18,6 +18,13 @@ function Input({
   id: string; label: string; value: number;
   onChange: (v: number) => void;
 }) {
+  const [raw, setRaw] = useState(String(value));
+  const editing = useRef(false);
+
+  useEffect(() => {
+    if (!editing.current) setRaw(String(value));
+  }, [value]);
+
   return (
     <div>
       <label htmlFor={id} className="block text-xs text-[var(--color-text-tertiary)] mb-2 font-medium uppercase tracking-wider">
@@ -25,11 +32,21 @@ function Input({
       </label>
       <input
         id={id}
-        type="number"
-        value={value}
-        min={0}
-        onChange={(e) => onChange(Math.max(0, Number(e.target.value) || 0))}
-        className="w-full bg-[var(--color-bg-input)] border border-[var(--color-border)] rounded-lg px-4 py-3 text-[var(--color-text)] text-lg outline-none focus:border-[var(--color-accent)] focus:ring-2 focus:ring-[var(--color-accent-light)] transition-all [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+        type="text"
+        inputMode="numeric"
+        pattern="[0-9]*"
+        value={raw}
+        onFocus={() => { editing.current = true; }}
+        onChange={(e) => {
+          const str = e.target.value.replace(/[^\d]/g, '');
+          setRaw(str);
+          onChange(Math.max(0, Number(str) || 0));
+        }}
+        onBlur={() => {
+          editing.current = false;
+          setRaw(String(value));
+        }}
+        className="w-full bg-[var(--color-bg-input)] border border-[var(--color-border)] rounded-lg px-4 py-3 text-[var(--color-text)] text-lg outline-none focus:border-[var(--color-accent)] focus:ring-2 focus:ring-[var(--color-accent-light)] transition-all"
       />
     </div>
   );
@@ -124,6 +141,8 @@ export default function Calculator({ lang }: CalculatorProps) {
       });
 
       await waitForAssets();
+      /* Extra tick — ensure conditional sections in ReportCanvas have rendered */
+      await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
 
       let reportDataUrl = '';
       if (exportCaptureRef.current) {
@@ -138,10 +157,13 @@ export default function Calculator({ lang }: CalculatorProps) {
         reportDataUrl = canvas.toDataURL('image/png');
       }
 
+      if (!reportDataUrl) throw new Error('empty capture');
+
       const { generateReport } = await import('@/lib/pdf');
       await generateReport({ context, lang, reportDataUrl });
       setDrawerOpen(false);
-    } catch {
+    } catch (err) {
+      console.error('[Stoffice PDF]', err);
       setExportError(t('pdfError', lang));
     } finally {
       setGenerating(false);

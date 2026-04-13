@@ -254,8 +254,7 @@ const dictionaries: Record<Locale, Record<string, string>> = {
     ctaEmail: 'info@stoffice.ch',
 
     /* ── FOOTER ───────────────────────────────────────── */
-    footerCopy: '© 2025–2026 Stoffice / Simone J. Stocker — MAS Real Estate',
-    footerDisclaimer: 'Alle Angaben ohne Gewähr. Werte dienen zur Veranschaulichung.',
+    footerCopy: '© 2026 Stoffice',
     footerPrivacy: 'Datenschutz',
     footerImprint: 'Impressum',
     admin: 'Admin',
@@ -609,8 +608,7 @@ const dictionaries: Record<Locale, Record<string, string>> = {
     ctaEmail: 'info@stoffice.ch',
 
     /* ── FOOTER ───────────────────────────────────────── */
-    footerCopy: '© 2025–2026 Stoffice / Simone J. Stocker — MAS Real Estate',
-    footerDisclaimer: 'Sans garantie. Valeurs à titre indicatif uniquement.',
+    footerCopy: '© 2026 Stoffice',
     footerPrivacy: 'Confidentialité',
     footerImprint: 'Mentions légales',
     admin: 'Admin',

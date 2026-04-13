@@ -553,7 +553,6 @@ export default function Home() {
         <div className="max-w-[1200px] mx-auto px-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-[11px] text-[var(--color-text-tertiary)]">
           <span>{t('footerCopy', lang)}</span>
           <div className="flex items-center gap-6">
-            <span>{t('footerDisclaimer', lang)}</span>
             <a href="/login" className="no-underline text-[var(--color-text-tertiary)] hover:text-[var(--color-accent)] transition-colors duration-300">
               {t('admin', lang)}
             </a>

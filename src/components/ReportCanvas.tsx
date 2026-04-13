@@ -236,8 +236,8 @@ export default function ReportCanvas({
 
         {/* ── Footer ── */}
         <footer className="mt-6 flex items-center justify-between border-t border-[var(--color-border)] pt-4 text-[10px] text-[var(--color-text-tertiary)]">
-          <span>{t('footerDisclaimer', lang)}</span>
-          <span>Stoffice · stoffice.vercel.app</span>
+          <span>{t('footerCopy', lang)}</span>
+          <span>stoffice.vercel.app</span>
         </footer>
       </div>
     </div>
