@@ -1,25 +1,27 @@
 @import "tailwindcss";
 
 @theme inline {
-  /* ── Dark, warm, moody palette — inspired by monochrome desk photography ── */
-  --color-bg: #0e0e12;
-  --color-bg-elevated: #16161c;
-  --color-bg-input: #1e1e26;
-  --color-bg-warm: #1a1914;
+  /* ── Warm light palette — extracted from monochrome desk photography ──
+     Tones: papier crème, clavier argenté mat, tasse céramique, peau
+     Feeling: magazine lifestyle, lumière naturelle douce, feutré         */
+  --color-bg: #f4f1ec;
+  --color-bg-elevated: #eae6df;
+  --color-bg-input: #e3dfd8;
+  --color-bg-warm: #f9f6f1;
 
-  --color-text: #e8e4de;
-  --color-text-secondary: #9e978e;
-  --color-text-tertiary: #6b665e;
+  --color-text: #2c2926;
+  --color-text-secondary: #6b665c;
+  --color-text-tertiary: #9e978a;
 
-  --color-accent: #c8a97a;
-  --color-accent-hover: #dbbf92;
-  --color-accent-light: rgba(200, 169, 122, 0.07);
+  --color-accent: #7d6e55;
+  --color-accent-hover: #6a5c46;
+  --color-accent-light: rgba(125, 110, 85, 0.06);
 
-  --color-border: #222228;
-  --color-border-strong: #33333c;
+  --color-border: #ddd8cf;
+  --color-border-strong: #c8c2b8;
 
-  --color-surface-glass: rgba(255, 255, 255, 0.03);
-  --color-glow: rgba(200, 169, 122, 0.08);
+  --color-surface-glass: rgba(255, 255, 255, 0.55);
+  --color-glow: rgba(125, 110, 85, 0.05);
 
   --font-serif: 'DM Serif Display', Georgia, serif;
   --font-sans: 'Inter', -apple-system, system-ui, sans-serif;
@@ -28,7 +30,7 @@
 
 ::selection {
   background: var(--color-accent);
-  color: #0e0e12;
+  color: #f4f1ec;
 }
 
 body {
@@ -38,14 +40,14 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* ── Subtle film-grain overlay for analog texture ── */
+/* ── Subtle paper-grain texture for analog warmth ── */
 body::before {
   content: '';
   position: fixed;
   inset: 0;
   z-index: 9999;
   pointer-events: none;
-  opacity: 0.025;
+  opacity: 0.018;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   background-size: 256px 256px;
 }
@@ -63,9 +65,9 @@ html {
   }
 }
 
-/* ── Sensual horizontal rule ── */
+/* ── Warm subtle divider line ── */
 .divider-glow {
   height: 1px;
-  background: linear-gradient(90deg, transparent, var(--color-accent) 30%, var(--color-accent) 70%, transparent);
-  opacity: 0.15;
+  background: linear-gradient(90deg, transparent, var(--color-border-strong) 30%, var(--color-border-strong) 70%, transparent);
+  opacity: 0.6;
 }

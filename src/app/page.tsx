@@ -31,7 +31,7 @@ function BtnPrimary({ href, children }: { href: string; children: React.ReactNod
   return (
     <a
       href={href}
-      className="inline-flex items-center justify-center px-8 py-3.5 bg-[var(--color-accent)] text-[var(--color-bg)] text-sm font-semibold rounded-full no-underline hover:bg-[var(--color-accent-hover)] transition-all duration-300"
+      className="inline-flex items-center justify-center px-8 py-3.5 bg-[var(--color-accent)] text-white text-sm font-semibold rounded-full no-underline hover:bg-[var(--color-accent-hover)] transition-all duration-300"
     >
       {children}
     </a>
@@ -127,7 +127,7 @@ export default function Home() {
             </p>
             <div className="flex flex-wrap items-center justify-center gap-x-14 gap-y-6">
               {['Dalux', 'HSLU', 'Wüest Partner', 'Implenia', 'pom+'].map((name) => (
-                <span key={name} className="text-[13px] font-medium text-[var(--color-text-tertiary)] opacity-30 hover:opacity-70 hover:text-[var(--color-accent)] transition-all duration-500">
+                <span key={name} className="text-[13px] font-medium text-[var(--color-text-tertiary)] opacity-50 hover:opacity-80 hover:text-[var(--color-accent)] transition-all duration-500">
                   {name}
                 </span>
               ))}
@@ -150,9 +150,9 @@ export default function Home() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               {[1, 2, 3, 4].map((n) => (
-                <article key={n} className="group rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-glass)] p-8 hover:border-[var(--color-border-strong)] hover:bg-[var(--color-bg-elevated)] transition-all duration-500">
+                <article key={n} className="group rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-glass)] p-8 hover:border-[var(--color-border-strong)] hover:bg-[var(--color-bg-warm)] transition-all duration-500">
                   <div className="flex items-start gap-4">
-                    <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-red-500/10 text-red-400">
+                    <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-red-50 text-red-500">
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
                       </svg>
@@ -311,7 +311,7 @@ export default function Home() {
             <div className="grid gap-5 lg:grid-cols-3">
               {/* Problem */}
               <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-glass)] p-8">
-                <div className="text-[11px] font-medium uppercase tracking-[0.2em] text-red-400 mb-5">
+                <div className="text-[11px] font-medium uppercase tracking-[0.2em] text-red-600 mb-5">
                   {t('caseProblemLabel', lang)}
                 </div>
                 <p className="text-[15px] leading-7 text-[var(--color-text-secondary)]">
@@ -330,14 +330,14 @@ export default function Home() {
               </div>
 
               {/* Results */}
-              <div className="rounded-2xl border border-emerald-800/30 bg-emerald-950/20 p-8">
-                <div className="text-[11px] font-medium uppercase tracking-[0.2em] text-emerald-400 mb-5">
+              <div className="rounded-2xl border border-emerald-200 bg-emerald-50/60 p-8">
+                <div className="text-[11px] font-medium uppercase tracking-[0.2em] text-emerald-700 mb-5">
                   {t('caseResultsLabel', lang)}
                 </div>
                 <ul className="space-y-3">
                   {[1, 2, 3, 4].map((n) => (
                     <li key={n} className="flex items-start gap-2.5">
-                      <span className="mt-2 h-1.5 w-1.5 rounded-full bg-emerald-400 shrink-0" />
+                      <span className="mt-2 h-1.5 w-1.5 rounded-full bg-emerald-500 shrink-0" />
                       <span className="text-[14px] leading-7 text-[var(--color-text-secondary)]">
                         {t(`caseResult${n}`, lang)}
                       </span>
@@ -376,7 +376,7 @@ export default function Home() {
                   <ul className="space-y-3">
                     {Array.from({ length: pains }, (_, i) => i + 1).map((p) => (
                       <li key={p} className="flex items-start gap-2.5">
-                        <span className="mt-2 h-1.5 w-1.5 rounded-full bg-red-400/60 shrink-0" />
+                        <span className="mt-2 h-1.5 w-1.5 rounded-full bg-red-400 shrink-0" />
                         <span className="text-[14px] text-[var(--color-text-secondary)] leading-relaxed">
                           {t(`seg${seg}Pain${p}`, lang)}
                         </span>
