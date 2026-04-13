@@ -38,10 +38,10 @@ export interface CalculatorResults {
 }
 
 const OPTIMIZATION_MAP: Record<string, { pct: number; labelKey: string; color: string }> = {
-  optZwilling: { pct: 0.75, labelKey: 'digitalTwinFactor', color: '#00d4aa' },
-  optAssets: { pct: 0.10, labelKey: 'assetsLinkedFactor', color: '#60a5fa' },
-  optDoku: { pct: 0.05, labelKey: 'docFactor', color: '#a87ad4' },
-  optAuto: { pct: 0.10, labelKey: 'autoFactor', color: '#d4a843' },
+  optZwilling: { pct: 0.75, labelKey: 'digitalTwinFactor', color: 'var(--color-accent)' },
+  optAssets: { pct: 0.10, labelKey: 'assetsLinkedFactor', color: 'var(--color-info)' },
+  optDoku: { pct: 0.05, labelKey: 'docFactor', color: 'var(--color-plum)' },
+  optAuto: { pct: 0.10, labelKey: 'autoFactor', color: 'var(--color-gold)' },
 };
 
 export const DEFAULTS: CalculatorInputs = {

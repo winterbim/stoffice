@@ -1,56 +1,112 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
+import { t } from '@/lib/i18n';
 
 interface HeaderProps {
   lang: 'de' | 'fr';
   onLangChange: (lang: 'de' | 'fr') => void;
 }
 
-export default function Header({ lang, onLangChange }: HeaderProps) {
+const NAV_LINKS = [
+  { key: 'navHow', href: '#how' },
+  { key: 'navWho', href: '#who' },
+  { key: 'navOffers', href: '#offers' },
+  { key: 'navFaq', href: '#faq' },
+] as const;
+
+export default function Header({ lang, onLangChange }: Readonly<HeaderProps>) {
+  const [mobileOpen, setMobileOpen] = useState(false);
+
   return (
-    <header className="sticky top-0 z-50 backdrop-blur-xl bg-[rgba(11,15,25,0.82)] border-b border-[var(--color-glass-border)]">
-      <div className="max-w-[1400px] mx-auto px-4 sm:px-8">
-        <div className="flex justify-between items-center h-[60px] sm:h-[72px]">
-          {/* Brand */}
-          <Link href="/" className="flex items-center gap-0.5 no-underline group">
-            <span className="font-[var(--font-serif)] text-[1.6rem] sm:text-[2.2rem] leading-none">
-              <span className="italic text-[var(--color-accent)] group-hover:drop-shadow-[0_0_8px_rgba(0,212,170,0.4)] transition-all">St</span>
-              <span className="text-[var(--color-text-0)]">office</span>
-            </span>
-            <span className="w-[5px] h-[5px] sm:w-[6px] sm:h-[6px] rounded-full bg-[var(--color-coral)] ml-0.5 -mt-3 sm:-mt-4 shadow-[0_0_6px_rgba(232,115,90,0.5)]" />
-          </Link>
+    <header className="fixed top-0 w-full z-50 bg-[var(--color-bg)]/90 backdrop-blur-md border-b border-[var(--color-border)]">
+      <div className="max-w-[1200px] mx-auto px-6 flex justify-between items-center h-16">
+        {/* Logo */}
+        <Link href="/" className="no-underline">
+          <span className="font-[var(--font-serif)] text-xl text-[var(--color-text)] tracking-tight">
+            Stoffice
+          </span>
+        </Link>
 
-          <div className="flex items-center gap-2 sm:gap-4">
-            {/* Lang */}
-            <div className="flex items-center gap-0.5 font-[var(--font-mono)] text-[10px] sm:text-[11px] uppercase tracking-wider">
-              {(['de', 'fr'] as const).map((l, i) => (
-                <span key={l} className="flex items-center">
-                  {i > 0 && <span className="text-[var(--color-bg-4)] mx-1">|</span>}
-                  <button
-                    onClick={() => onLangChange(l)}
-                    className={`px-2 py-1 rounded-md border-0 bg-transparent cursor-pointer transition-all ${
-                      lang === l
-                        ? 'text-[var(--color-accent)] font-bold bg-[var(--color-accent-glow)]'
-                        : 'text-[var(--color-text-3)] hover:text-[var(--color-text-1)]'
-                    }`}
-                  >
-                    {l.toUpperCase()}
-                  </button>
-                </span>
-              ))}
-            </div>
-
-            {/* CTA */}
-            <Link
-              href="/dashboard"
-              className="px-3 sm:px-5 py-2 sm:py-2.5 rounded-lg bg-[var(--color-accent)] text-[var(--color-bg-0)] font-semibold text-xs sm:text-sm no-underline hover:bg-[var(--color-accent-dim)] hover:shadow-[0_0_20px_rgba(0,212,170,0.3)] transition-all"
+        {/* Desktop nav */}
+        <nav className="hidden md:flex items-center gap-6">
+          {NAV_LINKS.map(({ key, href }) => (
+            <a
+              key={key}
+              href={href}
+              className="text-[13px] text-[var(--color-text-secondary)] no-underline hover:text-[var(--color-text)] transition-colors"
             >
-              {lang === 'fr' ? 'Tableau de bord' : 'Dashboard'}
-            </Link>
+              {t(key, lang)}
+            </a>
+          ))}
+        </nav>
+
+        {/* Right side */}
+        <div className="flex items-center gap-3">
+          {/* Lang switch */}
+          <div className="flex items-center gap-0.5 text-[11px] tracking-wider">
+            {(['de', 'fr'] as const).map((l) => (
+              <button
+                key={l}
+                onClick={() => onLangChange(l)}
+                aria-label={l === 'de' ? 'Deutsch' : 'Français'}
+                className={`px-2 py-1 rounded bg-transparent border-0 cursor-pointer transition-colors ${
+                  lang === l
+                    ? 'text-[var(--color-text)] font-medium'
+                    : 'text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]'
+                }`}
+              >
+                {l.toUpperCase()}
+              </button>
+            ))}
           </div>
+
+          {/* CTA — desktop */}
+          <a
+            href="mailto:info@stoffice.ch?subject=Demo"
+            className="hidden md:inline-flex items-center px-5 py-2 bg-[var(--color-accent)] text-white text-[13px] font-semibold rounded-lg no-underline hover:bg-[var(--color-accent-hover)] transition-colors"
+          >
+            {t('navDemo', lang)}
+          </a>
+
+          {/* Mobile hamburger */}
+          <button
+            onClick={() => setMobileOpen(!mobileOpen)}
+            className="md:hidden p-1.5 bg-transparent border-0 cursor-pointer text-[var(--color-text)]"
+            aria-label="Menu"
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              {mobileOpen
+                ? <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                : <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 9h16.5m-16.5 6.75h16.5" />
+              }
+            </svg>
+          </button>
         </div>
       </div>
+
+      {/* Mobile nav panel */}
+      {mobileOpen && (
+        <div className="md:hidden border-t border-[var(--color-border)] bg-[var(--color-bg)] px-6 py-4 space-y-3">
+          {NAV_LINKS.map(({ key, href }) => (
+            <a
+              key={key}
+              href={href}
+              onClick={() => setMobileOpen(false)}
+              className="block text-sm text-[var(--color-text-secondary)] no-underline py-1"
+            >
+              {t(key, lang)}
+            </a>
+          ))}
+          <a
+            href="mailto:info@stoffice.ch?subject=Demo"
+            className="block text-sm font-semibold text-[var(--color-accent)] no-underline pt-2"
+          >
+            {t('navDemo', lang)}
+          </a>
+        </div>
+      )}
     </header>
   );
 }

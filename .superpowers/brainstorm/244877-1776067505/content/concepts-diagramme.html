@@ -1,0 +1,48 @@
+<h2>3 concepts de diagramme innovant — Build → Handover → FM</h2>
+<p class="subtitle">Inspiré du Sankey, mais interactif et parlant. Quel concept te parle le plus ?</p>
+
+<div class="options">
+
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>🌊 "FlowPulse" — Rivière de données vivante</h3>
+      <p><strong>Concept :</strong> Une rivière animée coule de gauche (Build) à droite (FM). Les 4 flux de données (Assets, Documents, Garanties, Snags) sont des courants colorés dans la rivière. Au milieu, un <strong>barrage interactif</strong> = le Handover.</p>
+      <p><strong>Interaction :</strong> Le client <em>glisse un slider de 0% à 100%</em> pour régler la "qualité du Handover". À 100% : la rivière coule librement, les flux arrivent intacts côté FM, le compteur CHF montre les économies max. À 30% : la rivière se bloque, des particules rouges "fuient", le compteur CHF chute.</p>
+      <p><strong>Force :</strong> Métaphore physique intuitive. Le client comprend en 2 secondes : barrage ouvert = argent qui coule bien. Barrage fermé = argent perdu.</p>
+      <div class="pros-cons">
+        <div class="pros"><h4>Pour</h4><ul><li>Très visuel et intuitif</li><li>Un seul slider = interaction simple</li><li>Animation fluide captivante</li></ul></div>
+        <div class="cons"><h4>Contre</h4><ul><li>Moins de granularité par catégorie</li><li>Métaphore "eau" peut sembler déconnectée du BIM</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>🔬 "DataPipeline" — Tuyaux interactifs par catégorie</h3>
+      <p><strong>Concept :</strong> 4 "tuyaux" horizontaux (un par catégorie : Assets, Docs, Garanties, Snags) vont de Build à FM. Chaque tuyau a des <strong>particules animées</strong> qui circulent dedans. Entre les deux, la zone Handover avec un <strong>toggle ON/OFF par tuyau</strong>.</p>
+      <p><strong>Interaction :</strong> Le client active/désactive chaque catégorie individuellement. Quand un tuyau est "ON" : particules vertes coulent, côté FM le KPI correspondant s'allume en vert. Quand "OFF" : tuyau grisé, particules rouges qui se dispersent, KPI FM en rouge avec le surcoût affiché.</p>
+      <p><strong>Force :</strong> Granulaire — le client voit l'impact de CHAQUE catégorie. Un compteur CHF total en bas cumule les économies. Cohérent avec les toggles du calculateur existant.</p>
+      <div class="pros-cons">
+        <div class="pros"><h4>Pour</h4><ul><li>Impact par catégorie visible</li><li>Cohérent avec le calculateur existant</li><li>Chaque toggle a son propre "prix"</li></ul></div>
+        <div class="cons"><h4>Contre</h4><ul><li>Moins "wow" visuellement</li><li>Ressemble plus à un dashboard classique</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>⚡ "ImpactRadar" — Radar à impact inversé <em>(recommandé)</em></h3>
+      <p><strong>Concept :</strong> Un diagramme circulaire divisé en 3 anneaux concentriques (Build → Handover → FM). Les 4 catégories de données sont des <strong>rayons qui traversent les 3 anneaux</strong>. Chaque rayon a une épaisseur proportionnelle à la qualité du Handover.</p>
+      <p><strong>Interaction :</strong> Le client clique sur chaque catégorie dans l'anneau Build pour l'activer. Le rayon correspondant <strong>s'épaissit et pulse</strong> jusqu'à l'anneau FM, montrant le flux de données. Au centre : un gros chiffre CHF d'économies qui monte en temps réel. Autour : des micro-stats par catégorie.</p>
+      <p><strong>Force :</strong> Visuellement inédit. Personne n'a vu un "radar de données" qui pulse. Le format circulaire attire l'œil et le centre CHF est impossible à rater. Mélange entre Sankey (flux) et radar chart (catégories).</p>
+      <div class="pros-cons">
+        <div class="pros"><h4>Pour</h4><ul><li>Totalement nouveau — jamais vu ailleurs</li><li>Le CHF au centre capte l'attention immédiatement</li><li>Animation pulsante = sentiment de "données vivantes"</li><li>Format compact, fonctionne bien en mobile</li></ul></div>
+        <div class="cons"><h4>Contre</h4><ul><li>Plus complexe à implémenter</li><li>Peut nécessiter une légende explicative</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+</div>

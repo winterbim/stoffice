@@ -36,7 +36,7 @@ export async function daluxFetch(
   apiKey: string,
   baseUrl: string,
   endpoint: string,
-  options?: { method?: string; body?: unknown }
+  options?: { method?: string; body?: unknown; signal?: AbortSignal }
 ): Promise<unknown> {
   validateBaseUrl(baseUrl);
 
@@ -48,7 +48,7 @@ export async function daluxFetch(
     Accept: 'application/json',
   };
 
-  const fetchOptions: RequestInit = { method, headers };
+  const fetchOptions: RequestInit = { method, headers, signal: options?.signal };
 
   if (options?.body && (method === 'POST' || method === 'PATCH')) {
     headers['Content-Type'] = 'application/json';

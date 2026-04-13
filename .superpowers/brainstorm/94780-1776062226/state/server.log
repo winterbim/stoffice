@@ -1,0 +1,3 @@
+{"type":"server-started","port":64478,"host":"127.0.0.1","url_host":"localhost","url":"http://localhost:64478","screen_dir":"/home/wina/Bureau/stoffice/.superpowers/brainstorm/94780-1776062226/content","state_dir":"/home/wina/Bureau/stoffice/.superpowers/brainstorm/94780-1776062226/state"}
+{"type":"screen-added","file":"/home/wina/Bureau/stoffice/.superpowers/brainstorm/94780-1776062226/content/approaches.html"}
+{"type":"server-stopped","reason":"idle timeout"}

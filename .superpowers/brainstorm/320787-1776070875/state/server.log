@@ -1,0 +1,4 @@
+{"type":"server-started","port":63383,"host":"127.0.0.1","url_host":"localhost","url":"http://localhost:63383","screen_dir":"/home/wina/Bureau/stoffice/.superpowers/brainstorm/320787-1776070875/content","state_dir":"/home/wina/Bureau/stoffice/.superpowers/brainstorm/320787-1776070875/state"}
+{"type":"screen-added","file":"/home/wina/Bureau/stoffice/.superpowers/brainstorm/320787-1776070875/content/concepts-diagramme.html"}
+{"type":"screen-added","file":"/home/wina/Bureau/stoffice/.superpowers/brainstorm/320787-1776070875/content/impactradar-mockup.html"}
+{"type":"server-stopped","reason":"owner process exited"}

@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ImpactRadar — Maquette interactive</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0b0f19; color: #f0f4f8; font-family: 'Inter', -apple-system, sans-serif; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 30px 20px; }
+  h2 { font-size: 1.4rem; margin-bottom: 6px; text-align: center; }
+  .subtitle { color: #8b949e; font-size: 0.85rem; margin-bottom: 30px; text-align: center; }
+
+  .radar-container {
+    position: relative;
+    width: 520px;
+    height: 520px;
+  }
+
+  /* Anneaux */
+  .ring {
+    position: absolute;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.06);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .ring-outer {
+    width: 520px; height: 520px;
+    top: 0; left: 0;
+    background: radial-gradient(circle, transparent 60%, rgba(0,212,170,0.03) 100%);
+  }
+  .ring-mid {
+    width: 360px; height: 360px;
+    top: 80px; left: 80px;
+    background: radial-gradient(circle, transparent 50%, rgba(96,165,250,0.04) 100%);
+  }
+  .ring-inner {
+    width: 200px; height: 200px;
+    top: 160px; left: 160px;
+    background: radial-gradient(circle, rgba(0,212,170,0.08) 0%, transparent 70%);
+  }
+
+  /* Labels anneaux */
+  .ring-label {
+    position: absolute;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: #56616c;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .label-build { top: -18px; left: 50%; transform: translateX(-50%); color: #60a5fa; }
+  .label-handover { top: -18px; left: 50%; transform: translateX(-50%); color: #a87ad4; }
+  .label-fm { top: -18px; left: 50%; transform: translateX(-50%); color: #00d4aa; }
+
+  /* Centre = CHF */
+  .center-value {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 10;
+  }
+  .center-value .eyebrow {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: #56616c;
+    margin-bottom: 4px;
+  }
+  .center-value .amount {
+    font-size: 2.4rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #00d4aa, #34d399);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1;
+    transition: all 0.5s ease;
+  }
+  .center-value .per-year {
+    font-size: 11px;
+    color: #8b949e;
+    margin-top: 4px;
+  }
+
+  /* Rayons (catégories) */
+  .ray {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform-origin: 0 0;
+    cursor: pointer;
+    z-index: 5;
+    transition: all 0.4s ease;
+  }
+  .ray-line {
+    height: 3px;
+    width: 230px;
+    border-radius: 2px;
+    background: rgba(255,255,255,0.08);
+    position: relative;
+    transition: all 0.5s ease;
+  }
+  .ray.active .ray-line {
+    height: 6px;
+    box-shadow: 0 0 20px var(--ray-color);
+  }
+
+  /* Particules sur les rayons */
+  .particle {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0;
+  }
+  .ray.active .particle {
+    animation: flowParticle 2s linear infinite;
+  }
+  .ray.active .particle:nth-child(2) { animation-delay: 0.5s; }
+  .ray.active .particle:nth-child(3) { animation-delay: 1s; }
+  .ray.active .particle:nth-child(4) { animation-delay: 1.5s; }
+
+  @keyframes flowParticle {
+    0% { left: 0; opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { left: 210px; opacity: 0; }
+  }
+
+  /* Labels catégories */
+  .ray-label {
+    position: absolute;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+    transition: all 0.3s ease;
+    color: #56616c;
+  }
+  .ray.active .ray-label {
+    color: #f0f4f8;
+  }
+  .ray-savings {
+    position: absolute;
+    font-size: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    white-space: nowrap;
+    opacity: 0;
+    transition: all 0.3s ease;
+  }
+  .ray.active .ray-savings {
+    opacity: 1;
+    color: #34d399;
+  }
+
+  /* Boutons catégories autour du cercle */
+  .cat-btn {
+    position: absolute;
+    z-index: 20;
+    padding: 8px 14px;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: #151b28;
+    font-size: 12px;
+    font-weight: 600;
+    color: #8b949e;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .cat-btn:hover { border-color: rgba(255,255,255,0.15); color: #c9d1d9; }
+  .cat-btn.active {
+    border-color: var(--btn-color);
+    color: #f0f4f8;
+    box-shadow: 0 0 15px color-mix(in srgb, var(--btn-color) 30%, transparent);
+  }
+  .cat-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: currentColor;
+    transition: all 0.3s ease;
+  }
+  .cat-btn.active .cat-dot {
+    background: var(--btn-color);
+    box-shadow: 0 0 8px var(--btn-color);
+  }
+
+  /* Positions des boutons */
+  .cat-assets { top: 20px; right: -30px; --btn-color: #00d4aa; }
+  .cat-docs { bottom: 20px; right: -30px; --btn-color: #60a5fa; }
+  .cat-garanties { bottom: 20px; left: -30px; --btn-color: #a87ad4; }
+  .cat-snags { top: 20px; left: -30px; --btn-color: #d4a843; }
+
+  /* Pulsation */
+  @keyframes pulse-ring {
+    0% { box-shadow: 0 0 0 0 rgba(0,212,170,0.2); }
+    70% { box-shadow: 0 0 0 15px rgba(0,212,170,0); }
+    100% { box-shadow: 0 0 0 0 rgba(0,212,170,0); }
+  }
+  .ring-inner.has-active {
+    animation: pulse-ring 2s ease-in-out infinite;
+  }
+
+  /* Instruction */
+  .instruction {
+    margin-top: 30px;
+    text-align: center;
+    color: #56616c;
+    font-size: 12px;
+    padding: 12px 20px;
+    border: 1px dashed rgba(255,255,255,0.1);
+    border-radius: 8px;
+    max-width: 400px;
+  }
+  .instruction strong { color: #8b949e; }
+
+  /* Stats sous le radar */
+  .stats-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .stat-chip {
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.06);
+    background: #151b28;
+    text-align: center;
+    min-width: 100px;
+    transition: all 0.3s ease;
+    opacity: 0.4;
+  }
+  .stat-chip.active { opacity: 1; border-color: rgba(255,255,255,0.1); }
+  .stat-chip .val { font-size: 1rem; font-weight: 700; color: #f0f4f8; }
+  .stat-chip .lbl { font-size: 9px; color: #56616c; text-transform: uppercase; letter-spacing: 0.1em; margin-top: 2px; }
+</style>
+</head>
+<body>
+
+<h2>⚡ ImpactRadar — Maquette interactive</h2>
+<p class="subtitle">Clique sur les catégories pour voir le flux de données et l'impact CHF</p>
+
+<div class="radar-container" id="radar">
+  <!-- Anneaux -->
+  <div class="ring ring-outer">
+    <span class="ring-label label-build">BUILD</span>
+  </div>
+  <div class="ring ring-mid">
+    <span class="ring-label label-handover">HANDOVER</span>
+  </div>
+  <div class="ring ring-inner" id="innerRing">
+    <span class="ring-label label-fm">FM</span>
+  </div>
+
+  <!-- Centre CHF -->
+  <div class="center-value">
+    <div class="eyebrow">Économie annuelle</div>
+    <div class="amount" id="totalAmount">CHF 0</div>
+    <div class="per-year">/ an</div>
+  </div>
+
+  <!-- Boutons catégories -->
+  <button class="cat-btn cat-assets" onclick="toggleCat('assets')" id="btn-assets">
+    <span class="cat-dot"></span> Assets
+  </button>
+  <button class="cat-btn cat-docs" onclick="toggleCat('docs')" id="btn-docs">
+    <span class="cat-dot"></span> Documents
+  </button>
+  <button class="cat-btn cat-garanties" onclick="toggleCat('garanties')" id="btn-garanties">
+    <span class="cat-dot"></span> Garanties
+  </button>
+  <button class="cat-btn cat-snags" onclick="toggleCat('snags')" id="btn-snags">
+    <span class="cat-dot"></span> Snags
+  </button>
+
+  <!-- Canvas pour les rayons animés -->
+  <canvas id="rayCanvas" width="520" height="520" style="position:absolute;top:0;left:0;z-index:3;pointer-events:none;"></canvas>
+</div>
+
+<!-- Stats chips -->
+<div class="stats-row">
+  <div class="stat-chip" id="chip-assets">
+    <div class="val" style="color:#00d4aa">CHF 95k</div>
+    <div class="lbl">Assets</div>
+  </div>
+  <div class="stat-chip" id="chip-docs">
+    <div class="val" style="color:#60a5fa">CHF 18k</div>
+    <div class="lbl">Documents</div>
+  </div>
+  <div class="stat-chip" id="chip-garanties">
+    <div class="val" style="color:#a87ad4">CHF 32k</div>
+    <div class="lbl">Garanties</div>
+  </div>
+  <div class="stat-chip" id="chip-snags">
+    <div class="val" style="color:#d4a843">CHF 22k</div>
+    <div class="lbl">Snags</div>
+  </div>
+</div>
+
+<div class="instruction">
+  <strong>Comment ça marche :</strong> Chaque catégorie activée envoie un rayon pulsant de Build → FM. Le montant CHF au centre augmente en temps réel. Le client comprend instantanément : plus de rayons = plus d'économies.
+</div>
+
+<script>
+const cats = {
+  assets:    { active: false, angle: -45, color: '#00d4aa', savings: 95000 },
+  docs:      { active: false, angle: 45,  color: '#60a5fa', savings: 18000 },
+  garanties: { active: false, angle: 135, color: '#a87ad4', savings: 32000 },
+  snags:     { active: false, angle: 225, color: '#d4a843', savings: 22000 },
+};
+
+const canvas = document.getElementById('rayCanvas');
+const ctx = canvas.getContext('2d');
+const cx = 260, cy = 260;
+let animFrame;
+let particles = {};
+
+function toggleCat(id) {
+  cats[id].active = !cats[id].active;
+  document.getElementById('btn-' + id).classList.toggle('active');
+  document.getElementById('chip-' + id).classList.toggle('active');
+
+  // Pulse inner ring
+  const inner = document.getElementById('innerRing');
+  const anyActive = Object.values(cats).some(c => c.active);
+  inner.classList.toggle('has-active', anyActive);
+
+  // Update total
+  let total = 0;
+  for (const c of Object.values(cats)) {
+    if (c.active) total += c.savings;
+  }
+  const el = document.getElementById('totalAmount');
+  animateValue(el, total);
+
+  // Reset particles for this category
+  if (cats[id].active) {
+    particles[id] = Array.from({length: 6}, (_, i) => ({
+      progress: i * 0.16,
+      speed: 0.003 + Math.random() * 0.002,
+    }));
+  } else {
+    delete particles[id];
+  }
+}
+
+function animateValue(el, target) {
+  const current = parseInt(el.dataset.val || '0');
+  el.dataset.val = target;
+  const start = performance.now();
+  const duration = 600;
+  function step(ts) {
+    const p = Math.min((ts - start) / duration, 1);
+    const ease = 1 - Math.pow(1 - p, 3);
+    const v = Math.round(current + (target - current) * ease);
+    el.textContent = 'CHF ' + v.toLocaleString('de-CH');
+    if (p < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+function drawRays() {
+  ctx.clearRect(0, 0, 520, 520);
+
+  for (const [id, cat] of Object.entries(cats)) {
+    if (!cat.active) continue;
+
+    const rad = (cat.angle * Math.PI) / 180;
+    const innerR = 40;
+    const outerR = 240;
+
+    // Rayon (ligne)
+    ctx.beginPath();
+    ctx.moveTo(cx + Math.cos(rad) * innerR, cy + Math.sin(rad) * innerR);
+    ctx.lineTo(cx + Math.cos(rad) * outerR, cy + Math.sin(rad) * outerR);
+    ctx.strokeStyle = cat.color + '40';
+    ctx.lineWidth = 4;
+    ctx.stroke();
+
+    // Glow
+    ctx.beginPath();
+    ctx.moveTo(cx + Math.cos(rad) * innerR, cy + Math.sin(rad) * innerR);
+    ctx.lineTo(cx + Math.cos(rad) * outerR, cy + Math.sin(rad) * outerR);
+    ctx.strokeStyle = cat.color + '15';
+    ctx.lineWidth = 16;
+    ctx.stroke();
+
+    // Particules
+    if (particles[id]) {
+      for (const p of particles[id]) {
+        p.progress += p.speed;
+        if (p.progress > 1) p.progress -= 1;
+
+        // Flow de l'extérieur vers le centre
+        const r = outerR - (outerR - innerR) * p.progress;
+        const px = cx + Math.cos(rad) * r;
+        const py = cy + Math.sin(rad) * r;
+
+        const alpha = p.progress < 0.1 ? p.progress / 0.1 :
+                      p.progress > 0.9 ? (1 - p.progress) / 0.1 : 1;
+
+        ctx.beginPath();
+        ctx.arc(px, py, 4, 0, Math.PI * 2);
+        ctx.fillStyle = cat.color;
+        ctx.globalAlpha = alpha * 0.9;
+        ctx.fill();
+
+        // Glow particule
+        ctx.beginPath();
+        ctx.arc(px, py, 8, 0, Math.PI * 2);
+        ctx.fillStyle = cat.color;
+        ctx.globalAlpha = alpha * 0.2;
+        ctx.fill();
+
+        ctx.globalAlpha = 1;
+      }
+    }
+  }
+
+  animFrame = requestAnimationFrame(drawRays);
+}
+
+drawRays();
+</script>
+</body>
+</html>

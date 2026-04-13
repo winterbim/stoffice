@@ -1,335 +1,315 @@
 'use client';
 
-import { useState, useCallback, useMemo } from 'react';
-import { calculate, formatCHF, formatNumber, DEFAULTS, type CalculatorInputs } from '@/lib/calculator';
+import { useState, useCallback, useMemo, useRef } from 'react';
+import { flushSync } from 'react-dom';
+import { calculate, formatCHF, DEFAULTS, type CalculatorInputs } from '@/lib/calculator';
 import { t, type Locale } from '@/lib/i18n';
+import ReportDrawer, { type ReportContext } from './ReportDrawer';
+import ReportCanvas from './ReportCanvas';
+import SankeyDiagram from './SankeyDiagram';
 
 interface CalculatorProps {
   lang: Locale;
 }
 
-/* ── Number input ──────────────────────────────────── */
-
-function NumberInput({
-  id, label, value, unit, onChange,
+function Input({
+  id, label, value, onChange,
 }: {
-  id: string; label: string; value: number; unit: string;
+  id: string; label: string; value: number;
   onChange: (v: number) => void;
 }) {
   return (
-    <div className="flex flex-col gap-1.5">
-      <label htmlFor={id} className="text-[10px] font-[var(--font-mono)] font-medium text-[var(--color-text-3)] uppercase tracking-[0.1em]">
+    <div>
+      <label htmlFor={id} className="block text-xs text-[var(--color-text-tertiary)] mb-2 font-medium uppercase tracking-wider">
         {label}
       </label>
-      <div className="flex items-center bg-[var(--color-bg-0)] border border-[var(--color-glass-border)] rounded-xl focus-within:border-[var(--color-accent)] focus-within:shadow-[0_0_0_3px_var(--color-accent-glow),inset_0_1px_0_rgba(0,212,170,0.05)] transition-all">
-        <input
-          id={id}
-          type="number"
-          value={value}
-          onChange={(e) => onChange(Number(e.target.value) || 0)}
-          className="flex-1 min-w-0 bg-transparent border-none outline-none px-4 py-3.5 font-[var(--font-serif)] text-xl text-[var(--color-text-0)] [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-        />
-        <span className="pr-4 font-[var(--font-mono)] text-[10px] font-semibold text-[var(--color-text-3)] uppercase tracking-wider">
-          {unit}
-        </span>
-      </div>
+      <input
+        id={id}
+        type="number"
+        value={value}
+        min={0}
+        onChange={(e) => onChange(Math.max(0, Number(e.target.value) || 0))}
+        className="w-full bg-[var(--color-bg-input)] border border-[var(--color-border)] rounded-lg px-4 py-3 text-[var(--color-text)] text-lg outline-none focus:border-[var(--color-accent)] focus:ring-2 focus:ring-[var(--color-accent-light)] transition-all [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+      />
     </div>
   );
 }
 
-/* ── Toggle row ────────────────────────────────────── */
-
-function ToggleRow({
-  label, tip, pct, checked, color, onChange,
+function Toggle({
+  label, checked, onChange,
 }: {
-  label: string; tip: string; pct: string; checked: boolean; color: string;
+  label: string; checked: boolean;
   onChange: (v: boolean) => void;
 }) {
   return (
     <button
       type="button"
+      role="switch"
+      aria-checked={checked}
       onClick={() => onChange(!checked)}
-      className={`grid grid-cols-[1fr_auto_auto] items-center gap-4 px-5 py-4 cursor-pointer transition-all select-none text-left border-0 w-full ${
-        checked
-          ? 'bg-[rgba(0,212,170,0.05)]'
-          : 'bg-[var(--color-bg-1)] hover:bg-[var(--color-bg-2)]'
+      className={`flex items-center justify-between w-full py-3.5 px-0 bg-transparent border-0 cursor-pointer transition-colors text-left ${
+        checked ? 'text-[var(--color-text)]' : 'text-[var(--color-text-tertiary)]'
       }`}
-      title={tip}
-      style={checked ? { borderLeft: `2px solid ${color}` } : { borderLeft: '2px solid transparent' }}
     >
-      <span className={`text-sm ${checked ? 'text-[var(--color-text-0)] font-medium' : 'text-[var(--color-text-2)]'}`}>
-        {label}
-      </span>
-      <span className={`font-[var(--font-mono)] text-[11px] font-bold tracking-wide ${checked ? 'text-[var(--color-accent)]' : 'text-[var(--color-text-3)]'}`}>
-        {pct}
-      </span>
-      <div className="relative w-10 h-[22px]">
-        <div className={`absolute inset-0 rounded-full transition-all duration-300 ${
-          checked
-            ? 'bg-[var(--color-accent)] shadow-[0_0_10px_rgba(0,212,170,0.4)]'
-            : 'bg-[var(--color-bg-4)]'
-        }`}>
-          <div className={`absolute top-[2px] w-[18px] h-[18px] rounded-full transition-all duration-300 ${
-            checked
-              ? 'left-[20px] bg-white shadow-[0_0_6px_rgba(0,212,170,0.3)]'
-              : 'left-[2px] bg-[var(--color-text-3)]'
-          }`} />
-        </div>
+      <span className="text-sm">{label}</span>
+      <div className={`w-9 h-5 rounded-full transition-colors relative ${
+        checked ? 'bg-[var(--color-accent)]' : 'bg-[var(--color-border)]'
+      }`}>
+        <div className={`absolute top-0.5 w-4 h-4 rounded-full transition-all shadow-sm ${
+          checked ? 'left-[18px] bg-white' : 'left-0.5 bg-white'
+        }`} />
       </div>
     </button>
   );
 }
 
-/* ── Stat pill ─────────────────────────────────────── */
-
-function StatPill({ value, label, accent }: { value: string; label: string; accent?: boolean }) {
-  return (
-    <div className="flex flex-col items-center gap-1 px-4 py-4 bg-[var(--color-bg-0)] rounded-xl border border-[var(--color-glass-border)]">
-      <span className={`font-[var(--font-serif)] text-lg ${accent ? 'text-[var(--color-accent)]' : 'text-[var(--color-text-0)]'}`}>
-        {value}
-      </span>
-      <span className="text-[10px] text-[var(--color-text-3)] font-[var(--font-mono)] uppercase tracking-wider text-center">
-        {label}
-      </span>
-    </div>
-  );
-}
-
-/* ── Main calculator ───────────────────────────────── */
-
 export default function Calculator({ lang }: CalculatorProps) {
   const [inputs, setInputs] = useState<CalculatorInputs>(DEFAULTS);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [generating, setGenerating] = useState(false);
+  const [exportError, setExportError] = useState('');
+  const [reportContext, setReportContext] = useState<ReportContext | null>(null);
+  const exportCaptureRef = useRef<HTMLDivElement>(null);
 
   const update = useCallback(
     <K extends keyof CalculatorInputs>(key: K, value: CalculatorInputs[K]) => {
       setInputs((prev) => ({ ...prev, [key]: value }));
-    },
-    []
+    }, []
   );
 
   const results = useMemo(() => calculate(inputs), [inputs]);
+  const hasOptimizations = results && results.activeFactors.length > 0;
 
-  const totalPct = useMemo(() => {
-    let p = 0;
-    if (inputs.optZwilling) p += 0.75;
-    if (inputs.optAssets) p += 0.10;
-    if (inputs.optDoku) p += 0.05;
-    if (inputs.optAuto) p += 0.10;
-    return Math.min(p, 1);
-  }, [inputs.optZwilling, inputs.optAssets, inputs.optDoku, inputs.optAuto]);
+  const activeToggles = useMemo(() => ({
+    zwilling: inputs.optZwilling,
+    assets: inputs.optAssets,
+    doku: inputs.optDoku,
+    auto: inputs.optAuto,
+  }), [inputs.optAssets, inputs.optAuto, inputs.optDoku, inputs.optZwilling]);
 
-  const toggleColors: Record<string, string> = {
-    optZwilling: '#00d4aa',
-    optAssets: '#60a5fa',
-    optDoku: '#a87ad4',
-    optAuto: '#d4a843',
-  };
+  const waitForAssets = useCallback(async () => {
+    if ('fonts' in document) {
+      await document.fonts.ready;
+    }
+
+    const container = exportCaptureRef.current;
+    if (!container) return;
+
+    const images = Array.from(container.querySelectorAll('img'));
+    await Promise.all(
+      images.map((img) => {
+        if (img.complete) {
+          return typeof img.decode === 'function' ? img.decode().catch(() => undefined) : Promise.resolve();
+        }
+
+        return new Promise<void>((resolve) => {
+          img.addEventListener('load', () => resolve(), { once: true });
+          img.addEventListener('error', () => resolve(), { once: true });
+        });
+      })
+    );
+
+    await new Promise((resolve) => requestAnimationFrame(() => resolve(undefined)));
+  }, []);
+
+  const handleGeneratePdf = useCallback(async (context: ReportContext) => {
+    if (!results || !hasOptimizations) return;
+
+    setExportError('');
+    setGenerating(true);
+
+    try {
+      flushSync(() => {
+        setReportContext(context);
+      });
+
+      await waitForAssets();
+
+      let reportDataUrl = '';
+      if (exportCaptureRef.current) {
+        const { default: html2canvas } = await import('html2canvas');
+        const canvas = await html2canvas(exportCaptureRef.current, {
+          backgroundColor: '#ffffff',
+          scale: 2.5,
+          logging: false,
+          useCORS: true,
+          imageTimeout: 0,
+        });
+        reportDataUrl = canvas.toDataURL('image/png');
+      }
+
+      const { generateReport } = await import('@/lib/pdf');
+      await generateReport({ context, lang, reportDataUrl });
+      setDrawerOpen(false);
+    } catch {
+      setExportError(t('pdfError', lang));
+    } finally {
+      setGenerating(false);
+    }
+  }, [results, hasOptimizations, waitForAssets, lang]);
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.2fr] gap-6 items-start pb-8">
-
-      {/* ── INPUT CARD ─────────────────────────────── */}
-      <section className="card-glow p-8 relative">
-        {/* Top accent line */}
-        <div className="absolute top-0 left-8 right-8 h-px bg-gradient-to-r from-transparent via-[var(--color-accent)] to-transparent opacity-30" />
-
-        <div className="flex items-baseline gap-3 pb-5 mb-6 border-b border-[var(--color-glass-border)]">
-          <span className="font-[var(--font-mono)] text-[10px] font-bold text-[var(--color-accent)] tracking-wider opacity-60">01</span>
-          <h2 className="font-[var(--font-serif)] text-xl text-[var(--color-text-0)]">{t('inputVariables', lang)}</h2>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4 mb-4">
-          <NumberInput id="daysPerYear" label={t('daysPerYear', lang)} value={inputs.daysPerYear} unit={t('unitDays', lang)} onChange={(v) => update('daysPerYear', v)} />
-          <NumberInput id="incidentsPerDay" label={t('incidentsPerDay', lang)} value={inputs.incidentsPerDay} unit="/d" onChange={(v) => update('incidentsPerDay', v)} />
-        </div>
-        <div className="grid grid-cols-2 gap-4 mb-4">
-          <NumberInput id="minutesPerIncident" label={t('minutesPerIncident', lang)} value={inputs.minutesPerIncident} unit="min" onChange={(v) => update('minutesPerIncident', v)} />
-          <NumberInput id="hourlyRate" label={t('hourlyRate', lang)} value={inputs.hourlyRate} unit="CHF" onChange={(v) => update('hourlyRate', v)} />
-        </div>
-
-        <div className="h-px bg-[var(--color-glass-border)] my-5" />
-
-        <NumberInput id="costAI" label={t('costAI', lang)} value={inputs.costAI} unit="CHF/a" onChange={(v) => update('costAI', v)} />
-
-        <div className="h-px bg-[var(--color-glass-border)] my-5" />
-
-        <h3 className="font-[var(--font-serif)] text-base text-[var(--color-text-0)] mb-4">{t('optimizationFactors', lang)}</h3>
-
-        <div className="flex flex-col gap-px bg-[var(--color-glass-border)] rounded-xl overflow-hidden mb-5">
-          <ToggleRow label={t('digitalTwin', lang)} tip={t('digitalTwinTip', lang)} pct="75 %" checked={inputs.optZwilling} color={toggleColors.optZwilling} onChange={(v) => update('optZwilling', v)} />
-          <ToggleRow label={t('assetsLinked', lang)} tip={t('assetsLinkedTip', lang)} pct="10 %" checked={inputs.optAssets} color={toggleColors.optAssets} onChange={(v) => update('optAssets', v)} />
-          <ToggleRow label={t('docUpToDate', lang)} tip={t('docUpToDateTip', lang)} pct="5 %" checked={inputs.optDoku} color={toggleColors.optDoku} onChange={(v) => update('optDoku', v)} />
-          <ToggleRow label={t('autoOrders', lang)} tip={t('autoOrdersTip', lang)} pct="10 %" checked={inputs.optAuto} color={toggleColors.optAuto} onChange={(v) => update('optAuto', v)} />
-        </div>
-
-        {/* Meter */}
-        <div className="mb-6">
-          <div className="flex justify-between items-center mb-2 text-sm text-[var(--color-text-2)]">
-            <span>{t('totalOptimization', lang)}</span>
-            <strong className="font-[var(--font-mono)] text-sm font-bold text-[var(--color-accent)]">
-              {Math.round(totalPct * 100)} %
-            </strong>
-          </div>
-          <div className="h-1.5 bg-[var(--color-bg-0)] rounded-full overflow-hidden">
-            <div
-              className="h-full rounded-full transition-[width] duration-500 ease-out"
-              style={{
-                width: `${Math.round(totalPct * 100)}%`,
-                background: 'linear-gradient(90deg, #00d4aa, #60a5fa, #a87ad4)',
-                boxShadow: totalPct > 0 ? '0 0 12px rgba(0,212,170,0.4)' : 'none',
-              }}
-            />
-          </div>
-        </div>
-
-        <div className="flex justify-end">
-          <button
-            onClick={() => setInputs(DEFAULTS)}
-            className="px-5 py-2.5 rounded-lg bg-transparent border border-[var(--color-glass-border)] text-[var(--color-text-3)] font-medium text-xs cursor-pointer hover:text-[var(--color-text-1)] hover:border-[var(--color-text-3)] transition-all"
-          >
-            {t('reset', lang)}
-          </button>
-        </div>
-      </section>
-
-      {/* ── OUTPUT CARD ────────────────────────────── */}
-      <section className="card-glow p-8 relative lg:sticky lg:top-24">
-        {/* Top accent line */}
-        <div className="absolute top-0 left-8 right-8 h-px bg-gradient-to-r from-transparent via-[var(--color-plum)] to-transparent opacity-20" />
-
-        <div className="flex items-baseline gap-3 pb-5 mb-6 border-b border-[var(--color-glass-border)]">
-          <span className="font-[var(--font-mono)] text-[10px] font-bold text-[var(--color-plum)] tracking-wider opacity-60">02</span>
-          <h2 className="font-[var(--font-serif)] text-xl text-[var(--color-text-0)]">{t('results', lang)}</h2>
-        </div>
-
-        {!results || results.activeFactors.length === 0 ? (
-          /* ── Empty state ──────────────────────────── */
-          <div className="flex flex-col items-center justify-center py-16 text-center">
-            {/* Animated rings */}
-            <div className="relative w-24 h-24 mb-6">
-              <div className="absolute inset-0 rounded-full border border-[var(--color-glass-border)] animate-[pulse_3s_ease-in-out_infinite]" />
-              <div className="absolute inset-3 rounded-full border border-[var(--color-glass-border)] animate-[pulse_3s_ease-in-out_infinite_0.5s]" />
-              <div className="absolute inset-6 rounded-full border border-[var(--color-glass-border)] animate-[pulse_3s_ease-in-out_infinite_1s]" />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <svg className="w-8 h-8 text-[var(--color-text-3)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
-                </svg>
+    <>
+      <div className="grid grid-cols-1 gap-10 xl:grid-cols-[minmax(0,1.08fr)_minmax(360px,0.92fr)] xl:items-start">
+        {/* Inputs */}
+        <div className="rounded-[28px] border border-[var(--color-border)] bg-white p-7 md:p-8">
+          <div className="mb-8 flex items-end justify-between gap-4">
+            <div>
+              <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--color-accent)] mb-2">
+                {t('calcEyebrow', lang)}
+              </div>
+              <div className="font-[var(--font-serif)] text-[2rem] leading-none text-[var(--color-text)]">
+                {t('calcTitle', lang)}
               </div>
             </div>
-            <p className="font-[var(--font-serif)] text-lg text-[var(--color-text-2)] mb-1.5">
-              {t('placeholderTitle', lang)}
-            </p>
-            <p className="text-xs text-[var(--color-text-3)] max-w-[240px]">
-              {t('placeholderSub', lang)}
-            </p>
+            <button
+              onClick={() => setInputs(DEFAULTS)}
+              className="shrink-0 text-xs text-[var(--color-text-tertiary)] bg-transparent border-0 cursor-pointer hover:text-[var(--color-text-secondary)] transition-colors"
+            >
+              {t('reset', lang)}
+            </button>
           </div>
-        ) : (
-          /* ── Results ──────────────────────────────── */
-          <div>
-            {/* Hero savings */}
-            <div className="text-center py-6 mb-6 rounded-xl bg-[var(--color-bg-0)] border border-[var(--color-glass-border)] relative overflow-hidden">
-              {/* Glow background */}
-              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,212,170,0.06)_0%,transparent_70%)]" />
-              <span className="relative block font-[var(--font-mono)] text-[10px] uppercase tracking-[0.2em] text-[var(--color-text-3)] mb-3">
-                {t('heroEyebrow', lang)}
-              </span>
-              <span className="relative block font-[var(--font-serif)] text-[2.8rem] leading-none tracking-tight"
-                style={{
-                  background: 'linear-gradient(135deg, #00d4aa, #34d399)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  filter: 'drop-shadow(0 0 20px rgba(0,212,170,0.2))',
-                }}
-              >
-                {formatCHF(Math.round(results.netSavings))}
-              </span>
-              <div className="relative flex items-center justify-center gap-2 mt-3 text-xs text-[var(--color-text-3)]">
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-[rgba(0,212,170,0.08)] border border-[rgba(0,212,170,0.12)] rounded-full text-[var(--color-accent)] font-[var(--font-mono)] text-[10px] font-bold">
-                  &darr; {Math.round(results.totalOptimizationPct * 100)} %
-                </span>
-                <span>{t('perYear', lang)}</span>
-              </div>
-            </div>
 
-            {/* Stats grid */}
-            <div className="grid grid-cols-3 gap-3 mb-6">
-              <StatPill value={formatCHF(Math.round(results.costNow))} label={t('currentCosts', lang)} />
-              <StatPill value={formatCHF(Math.round(results.costNew))} label={t('optimizedCosts', lang)} accent />
-              <StatPill
-                value={`${formatNumber(results.hoursSaved)} ${t('hours', lang)}`}
-                label={`${formatNumber(results.hoursSaved / 8)} ${t('workdays', lang)}`}
-              />
+          {/* Hypotheses */}
+          <div className="mb-8 rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-elevated)] p-5">
+            <div className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[var(--color-text-tertiary)] mb-3">
+              {t('calcHypothesesTitle', lang)}
             </div>
+            <ul className="space-y-1.5">
+              {[1, 2, 3, 4].map((n) => (
+                <li key={n} className="text-[12px] leading-5 text-[var(--color-text-secondary)] flex items-start gap-2">
+                  <span className="mt-1 h-1 w-1 rounded-full bg-[var(--color-text-tertiary)] shrink-0" />
+                  {t(`calcHypothesis${n}`, lang)}
+                </li>
+              ))}
+            </ul>
+          </div>
 
-            {/* Breakdown */}
-            <h3 className="font-[var(--font-serif)] text-base text-[var(--color-text-0)] mb-3">{t('breakdown', lang)}</h3>
-            <div className="rounded-xl overflow-hidden border border-[var(--color-glass-border)] mb-6">
-              {results.activeFactors.map((f) => {
-                const savingsAmt = results.costNow * f.pct;
-                const barWidth = (f.pct / results.totalOptimizationPct) * 100;
-                return (
-                  <div key={f.id} className="flex items-center gap-3 px-4 py-3 border-b border-[var(--color-glass-border)] last:border-0 bg-[var(--color-bg-1)]">
-                    <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: f.color }} />
-                    <span className="flex-1 text-sm text-[var(--color-text-1)]">
-                      {t(f.labelKey, lang)}
-                    </span>
-                    {/* Mini bar */}
-                    <div className="w-16 h-1 rounded-full bg-[var(--color-bg-0)] overflow-hidden">
-                      <div className="h-full rounded-full" style={{ width: `${barWidth}%`, backgroundColor: f.color }} />
-                    </div>
-                    <span className="font-[var(--font-mono)] text-xs font-semibold text-[var(--color-success)] w-24 text-right">
-                      +{formatCHF(Math.round(savingsAmt))}
-                    </span>
-                  </div>
-                );
-              })}
-              {inputs.costAI > 0 && (
-                <div className="flex items-center gap-3 px-4 py-3 bg-[var(--color-bg-1)]">
-                  <span className="w-2 h-2 rounded-full shrink-0 bg-[var(--color-danger)]" />
-                  <span className="flex-1 text-sm text-[var(--color-text-1)]">{t('aiInvestment', lang)}</span>
-                  <div className="w-16" />
-                  <span className="font-[var(--font-mono)] text-xs font-semibold text-[var(--color-danger)] w-24 text-right">
-                    &minus;{formatCHF(inputs.costAI)}
-                  </span>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <Input id="days" label={t('daysPerYear', lang)} value={inputs.daysPerYear} onChange={(v) => update('daysPerYear', v)} />
+            <Input id="incidents" label={t('incidentsPerDay', lang)} value={inputs.incidentsPerDay} onChange={(v) => update('incidentsPerDay', v)} />
+            <Input id="minutes" label={t('minutesPerIncident', lang)} value={inputs.minutesPerIncident} onChange={(v) => update('minutesPerIncident', v)} />
+            <Input id="rate" label={t('hourlyRate', lang)} value={inputs.hourlyRate} onChange={(v) => update('hourlyRate', v)} />
+          </div>
+
+          <div className="mt-4">
+            <Input id="costAI" label={t('costAI', lang)} value={inputs.costAI} onChange={(v) => update('costAI', v)} />
+          </div>
+
+          <div className="mt-8 mb-3 text-xs text-[var(--color-text-tertiary)] font-medium uppercase tracking-wider">
+            {t('optimizations', lang)}
+          </div>
+          <div className="divide-y divide-[var(--color-border)] rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg-elevated)] px-5">
+            <Toggle label={t('digitalTwin', lang)} checked={inputs.optZwilling} onChange={(v) => update('optZwilling', v)} />
+            <Toggle label={t('assetsLinked', lang)} checked={inputs.optAssets} onChange={(v) => update('optAssets', v)} />
+            <Toggle label={t('docUpToDate', lang)} checked={inputs.optDoku} onChange={(v) => update('optDoku', v)} />
+            <Toggle label={t('autoOrders', lang)} checked={inputs.optAuto} onChange={(v) => update('optAuto', v)} />
+          </div>
+        </div>
+
+        {/* Result */}
+        <div className="xl:sticky xl:top-24 rounded-[28px] border border-[var(--color-border)] bg-[var(--color-bg-elevated)] p-8 md:p-10" role="status" aria-live="polite">
+          {hasOptimizations ? (
+            <div className="flex min-h-[320px] flex-col justify-between">
+              <div>
+                <div className="text-xs text-[var(--color-text-tertiary)] font-medium uppercase tracking-[0.15em] mb-4">
+                  {t('savingsPerYear', lang)}
                 </div>
-              )}
-            </div>
+                <div className="font-[var(--font-serif)] text-[clamp(2.8rem,5vw,4.8rem)] text-[var(--color-accent)] leading-[0.95] tracking-tight mb-8">
+                  {formatCHF(Math.round(results.netSavings))}
+                </div>
+              </div>
 
-            {/* ROI */}
-            {inputs.costAI > 0 && (
-              <div className="pt-5 border-t border-[var(--color-glass-border)]">
-                <h3 className="font-[var(--font-serif)] text-base text-[var(--color-text-0)] mb-4">{t('roi', lang)}</h3>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                  <div className="bg-[var(--color-bg-0)] border border-[var(--color-glass-border)] rounded-xl p-4 text-center">
-                    <div className={`font-[var(--font-serif)] text-xl ${results.roiPct >= 100 ? 'text-[var(--color-success)]' : 'text-[var(--color-warning)]'}`}>
-                      {Math.round(results.roiPct)} %
+              {inputs.costAI > 0 && (
+                <div className="grid grid-cols-2 gap-4 mb-8">
+                  <div className="rounded-2xl bg-white px-5 py-4 text-center">
+                    <div className="font-[var(--font-serif)] text-2xl text-[var(--color-text)]">
+                      {Math.round(results.roiPct)}&thinsp;%
                     </div>
-                    <div className="text-[10px] text-[var(--color-text-3)] font-[var(--font-mono)] uppercase tracking-wider mt-1">{t('roiLabel', lang)}</div>
+                    <div className="mt-1 text-xs text-[var(--color-text-tertiary)]">
+                      {t('roiLabel', lang)}
+                    </div>
                   </div>
-                  <div className="bg-[var(--color-bg-0)] border border-[var(--color-glass-border)] rounded-xl p-4 text-center">
-                    <div className="font-[var(--font-serif)] text-xl text-[var(--color-text-0)]">
+                  <div className="rounded-2xl bg-white px-5 py-4 text-center">
+                    <div className="font-[var(--font-serif)] text-2xl text-[var(--color-text)]">
                       {results.paybackMonths <= 12
                         ? `${results.paybackMonths} ${t('months', lang)}`
                         : `${(results.paybackMonths / 12).toFixed(1)} ${t('years', lang)}`}
                     </div>
-                    <div className="text-[10px] text-[var(--color-text-3)] font-[var(--font-mono)] uppercase tracking-wider mt-1">{t('paybackPeriod', lang)}</div>
-                  </div>
-                  <div className="bg-[var(--color-bg-0)] border border-[var(--color-glass-border)] rounded-xl p-4 text-center">
-                    <div className="font-[var(--font-serif)] text-xl text-[var(--color-text-0)]">{formatCHF(inputs.costAI)}</div>
-                    <div className="text-[10px] text-[var(--color-text-3)] font-[var(--font-mono)] uppercase tracking-wider mt-1">{t('investment', lang)}</div>
-                  </div>
-                  <div className="bg-[var(--color-bg-0)] border border-[var(--color-glass-border)] rounded-xl p-4 text-center">
-                    <div className={`font-[var(--font-serif)] text-xl ${results.netSavings >= 0 ? 'text-[var(--color-success)]' : 'text-[var(--color-danger)]'}`}>
-                      {formatCHF(Math.round(results.netSavings))}
+                    <div className="mt-1 text-xs text-[var(--color-text-tertiary)]">
+                      {t('paybackLabel', lang)}
                     </div>
-                    <div className="text-[10px] text-[var(--color-text-3)] font-[var(--font-mono)] uppercase tracking-wider mt-1">{t('netProfit', lang)}</div>
                   </div>
                 </div>
+              )}
+
+              <div className="space-y-3">
+                <button
+                  onClick={() => setDrawerOpen(true)}
+                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-[var(--color-accent)] px-5 py-3 text-sm font-semibold text-white cursor-pointer transition-colors hover:bg-[var(--color-accent-hover)]"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                  </svg>
+                  {t('reportBtn', lang)}
+                </button>
+                <a
+                  href={`mailto:info@stoffice.ch?subject=ROI%20Estimate&body=${encodeURIComponent('Net savings: ' + formatCHF(Math.round(results.netSavings)) + ' / ROI: ' + Math.round(results.roiPct) + '%')}`}
+                  className="flex w-full items-center justify-center gap-2 rounded-xl border border-[var(--color-border)] bg-white px-5 py-3 text-sm font-medium text-[var(--color-text)] no-underline cursor-pointer transition-colors hover:bg-[var(--color-bg-elevated)]"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+                  </svg>
+                  {t('calcGetEstimate', lang)}
+                </a>
+                <p className="text-center text-[12px] leading-relaxed text-[var(--color-text-tertiary)] mt-2">
+                  {t('calcDisclaimer', lang)}
+                </p>
               </div>
-            )}
-          </div>
-        )}
-      </section>
-    </div>
+            </div>
+          ) : (
+            <p className="text-[var(--color-text-tertiary)] text-center max-w-[240px]">
+              {t('enableOptimizations', lang)}
+            </p>
+          )}
+        </div>
+      </div>
+
+      {/* Sankey preview — below calculator, always visible when active */}
+      {hasOptimizations && results && (
+        <div className="mt-16 border-t border-[var(--color-border)] pt-12">
+          <SankeyDiagram
+            lang={lang}
+            activeToggles={activeToggles}
+            costNow={results.costNow}
+          />
+        </div>
+      )}
+
+      {reportContext && hasOptimizations && results && (
+        <div
+          ref={exportCaptureRef}
+          aria-hidden="true"
+          className="fixed left-[-300vw] top-0 bg-white"
+        >
+          <ReportCanvas
+            lang={lang}
+            context={reportContext}
+            results={results}
+            activeToggles={activeToggles}
+          />
+        </div>
+      )}
+
+      {/* Report drawer */}
+      <ReportDrawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        onGenerate={handleGeneratePdf}
+        lang={lang}
+        generating={generating}
+        errorMessage={exportError}
+      />
+    </>
   );
 }

@@ -1,0 +1,88 @@
+<h2>3 Approches Architecturales — Stoffice MVP Commercial</h2>
+<p class="subtitle">Cliquez sur l'approche qui vous convient le mieux</p>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)" style="border-left: 3px solid #00d4aa;">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>⭐ Monorepo Next.js Full-Stack (Recommandé)</h3>
+      <p><strong>Architecture :</strong> Un seul projet Next.js avec App Router</p>
+      <ul style="margin:12px 0;padding-left:20px;font-size:14px;line-height:1.8;color:#aaa;">
+        <li><strong>Frontend</strong> : React + Tailwind + shadcn/ui (dashboard + calculateur)</li>
+        <li><strong>Backend</strong> : API Routes Next.js (proxy Dalux sécurisé, CRUD tenants)</li>
+        <li><strong>Auth</strong> : NextAuth.js (credentials + JWT)</li>
+        <li><strong>DB</strong> : PostgreSQL via Prisma (tenants, clés API chiffrées, cache Dalux)</li>
+        <li><strong>Deploy</strong> : Vercel + Vercel Postgres</li>
+      </ul>
+      <div style="display:flex;gap:16px;margin-top:8px;">
+        <div style="background:rgba(0,212,170,0.1);padding:8px 12px;border-radius:6px;font-size:13px;">
+          <strong style="color:#00d4aa;">PRO</strong><br/>
+          Un seul déploiement, DX optimal, Vercel-native, rapide à itérer
+        </div>
+        <div style="background:rgba(248,113,113,0.1);padding:8px 12px;border-radius:6px;font-size:13px;">
+          <strong style="color:#f87171;">CON</strong><br/>
+          Couplage front/back, scalabilité limitée long terme
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Frontend Next.js + Backend API séparé</h3>
+      <p><strong>Architecture :</strong> Deux projets — frontend React et API Express/Fastify</p>
+      <ul style="margin:12px 0;padding-left:20px;font-size:14px;line-height:1.8;color:#aaa;">
+        <li><strong>Frontend</strong> : Next.js (SSR pages + React dashboard)</li>
+        <li><strong>Backend</strong> : Express.js sur Vercel Functions ou Railway</li>
+        <li><strong>Auth</strong> : JWT custom + middleware</li>
+        <li><strong>DB</strong> : PostgreSQL (Supabase ou Neon)</li>
+        <li><strong>Deploy</strong> : Vercel (front) + Railway/Render (API)</li>
+      </ul>
+      <div style="display:flex;gap:16px;margin-top:8px;">
+        <div style="background:rgba(0,212,170,0.1);padding:8px 12px;border-radius:6px;font-size:13px;">
+          <strong style="color:#00d4aa;">PRO</strong><br/>
+          Séparation claire, API réutilisable, scale indépendant
+        </div>
+        <div style="background:rgba(248,113,113,0.1);padding:8px 12px;border-radius:6px;font-size:13px;">
+          <strong style="color:#f87171;">CON</strong><br/>
+          Double infra, CORS à gérer, plus complexe pour un MVP
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>Next.js + Supabase (BaaS)</h3>
+      <p><strong>Architecture :</strong> Next.js frontend + Supabase comme backend complet</p>
+      <ul style="margin:12px 0;padding-left:20px;font-size:14px;line-height:1.8;color:#aaa;">
+        <li><strong>Frontend</strong> : Next.js + Tailwind</li>
+        <li><strong>Backend</strong> : Supabase (auth, DB, storage, edge functions)</li>
+        <li><strong>Auth</strong> : Supabase Auth (email/password natif, SSO futur)</li>
+        <li><strong>DB</strong> : Supabase PostgreSQL (Row Level Security)</li>
+        <li><strong>Deploy</strong> : Vercel (front) + Supabase Cloud</li>
+      </ul>
+      <div style="display:flex;gap:16px;margin-top:8px;">
+        <div style="background:rgba(0,212,170,0.1);padding:8px 12px;border-radius:6px;font-size:13px;">
+          <strong style="color:#00d4aa;">PRO</strong><br/>
+          Auth + DB + RLS gratuit, très rapide à builder, multi-tenant natif
+        </div>
+        <div style="background:rgba(248,113,113,0.1);padding:8px 12px;border-radius:6px;font-size:13px;">
+          <strong style="color:#f87171;">CON</strong><br/>
+          Vendor lock-in Supabase, Edge Functions limitées, moins de contrôle
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="margin-top:32px;padding:20px;background:rgba(0,212,170,0.05);border:1px solid rgba(0,212,170,0.2);border-radius:12px;">
+  <h3 style="color:#00d4aa;margin-bottom:8px;">💡 Ma recommandation : Approche A</h3>
+  <p style="font-size:14px;line-height:1.6;color:#aaa;">
+    Le monorepo Next.js est le sweet spot pour un MVP commercial. Un seul repo, un seul déploiement Vercel,
+    API routes intégrées pour le proxy Dalux sécurisé, NextAuth pour l'auth, et Prisma + Vercel Postgres pour la DB.
+    C'est ce que font 90% des SaaS B2B modernes à ce stade. On pourra toujours extraire le backend plus tard si nécessaire.
+  </p>
+</div>

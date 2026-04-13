@@ -45,33 +45,29 @@ function LoginForm() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[var(--color-bg-0)] px-4">
-      <div className="w-full max-w-[400px]">
-        {/* Brand */}
-        <Link href="/" className="flex items-center justify-center gap-0.5 no-underline font-[var(--font-serif)] text-[3rem] text-[var(--color-text-0)] mb-10">
-          <span className="italic text-[var(--color-accent)]">St</span>
-          <span className="font-normal">office</span>
-          <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-coral)] ml-0.5 mb-1.5 self-start" />
+    <div className="min-h-screen flex items-center justify-center px-4">
+      <div className="w-full max-w-[380px]">
+        <Link href="/" className="block text-center no-underline font-[var(--font-serif)] text-3xl text-[var(--color-text)] mb-10">
+          Stoffice
         </Link>
 
-        {/* Card */}
-        <div className="rounded-2xl border border-[var(--color-glass-border)] bg-[var(--color-bg-1)] p-8">
-          <h1 className="font-[var(--font-serif)] text-2xl text-[var(--color-text-0)] mb-1">
+        <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-elevated)] p-8">
+          <h1 className="font-[var(--font-serif)] text-xl text-[var(--color-text)] mb-1">
             Anmelden
           </h1>
-          <p className="text-sm text-[var(--color-text-3)] mb-6">
-            Zugang zum Dashboard & Dalux-Integration
+          <p className="text-sm text-[var(--color-text-tertiary)] mb-6">
+            Zugang zum Dashboard
           </p>
 
           {error && (
-            <div className="mb-4 px-4 py-3 rounded-lg bg-[rgba(248,113,113,0.1)] border border-[rgba(248,113,113,0.2)] text-[var(--color-danger)] text-sm">
+            <div className="mb-4 px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-red-600 text-sm">
               {error}
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label htmlFor="email" className="block text-xs font-[var(--font-mono)] uppercase tracking-wider text-[var(--color-text-3)] mb-2">
+              <label htmlFor="email" className="block text-xs font-medium uppercase tracking-wider text-[var(--color-text-tertiary)] mb-2">
                 E-Mail
               </label>
               <input
@@ -81,13 +77,13 @@ function LoginForm() {
                 autoComplete="email"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
-                className="w-full px-4 py-3 rounded-lg bg-[var(--color-bg-2)] border border-[var(--color-glass-border)] text-[var(--color-text-0)] placeholder:text-[var(--color-text-3)] focus:outline-none focus:border-[var(--color-accent)] focus:ring-1 focus:ring-[var(--color-accent)] transition-colors"
+                className="w-full px-4 py-3 rounded-lg bg-[var(--color-bg-input)] border border-[var(--color-border)] text-[var(--color-text)] placeholder:text-[var(--color-text-tertiary)] outline-none focus:border-[var(--color-accent)] focus:ring-2 focus:ring-[var(--color-accent-light)] transition-all"
                 placeholder="name@firma.ch"
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-xs font-[var(--font-mono)] uppercase tracking-wider text-[var(--color-text-3)] mb-2">
+              <label htmlFor="password" className="block text-xs font-medium uppercase tracking-wider text-[var(--color-text-tertiary)] mb-2">
                 Passwort
               </label>
               <input
@@ -97,7 +93,7 @@ function LoginForm() {
                 autoComplete="current-password"
                 value={password}
                 onChange={e => setPassword(e.target.value)}
-                className="w-full px-4 py-3 rounded-lg bg-[var(--color-bg-2)] border border-[var(--color-glass-border)] text-[var(--color-text-0)] placeholder:text-[var(--color-text-3)] focus:outline-none focus:border-[var(--color-accent)] focus:ring-1 focus:ring-[var(--color-accent)] transition-colors"
+                className="w-full px-4 py-3 rounded-lg bg-[var(--color-bg-input)] border border-[var(--color-border)] text-[var(--color-text)] placeholder:text-[var(--color-text-tertiary)] outline-none focus:border-[var(--color-accent)] focus:ring-2 focus:ring-[var(--color-accent-light)] transition-all"
                 placeholder="••••••••"
               />
             </div>
@@ -105,15 +101,15 @@ function LoginForm() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 rounded-lg bg-[var(--color-accent)] text-[var(--color-bg-0)] font-semibold text-sm hover:bg-[var(--color-accent-dim)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-3 rounded-lg bg-[var(--color-accent)] text-white font-semibold text-sm hover:bg-[var(--color-accent-hover)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Wird angemeldet…' : 'Anmelden'}
             </button>
           </form>
         </div>
 
-        <p className="text-center text-xs text-[var(--color-text-3)] mt-6">
-          © 2025–2026 Stoffice — Simone J. Stocker
+        <p className="text-center text-xs text-[var(--color-text-tertiary)] mt-6">
+          © 2025–2026 Stoffice
         </p>
       </div>
     </div>
