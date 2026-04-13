@@ -119,7 +119,7 @@ export default function SankeyDiagram({
   const linkPath = sankeyLinkHorizontal<GraphNode, GraphLink>();
 
   return (
-    <section className="rounded-[32px] border border-[var(--color-border)] bg-white p-6 sm:p-8">
+    <section className="rounded-[32px] border border-[var(--color-border)] p-6 sm:p-8" style={{ backgroundColor: '#ffffff' }}>
       <div className="border-b border-[var(--color-border)] pb-6">
         <div className="text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--color-text-tertiary)]">
           {t('reportPreviewLabel', lang)}
@@ -150,8 +150,9 @@ export default function SankeyDiagram({
                       className={`inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-medium ${
                         row.active
                           ? 'bg-[var(--color-accent-light)] text-[var(--color-accent)]'
-                          : 'bg-white text-[var(--color-text-tertiary)]'
+                          : 'text-[var(--color-text-tertiary)]'
                       }`}
+                      style={!row.active ? { backgroundColor: '#ffffff' } : undefined}
                     >
                       {row.statusLabel}
                     </span>
@@ -219,7 +220,7 @@ export default function SankeyDiagram({
               <div className="mt-3 font-[var(--font-serif)] text-[2.4rem] leading-none text-[#166534]">
                 {formatCHF(totalSaved)}
               </div>
-              <p className="mt-3 text-sm leading-6 text-[#166534]/80">
+              <p className="mt-3 text-sm leading-6" style={{ color: 'rgba(22,101,52,0.8)' }}>
                 {lang === 'fr'
                   ? 'Informations utilisables immédiatement dans l’exploitation et la maintenance.'
                   : 'Informationen, die im Betrieb und in der Wartung direkt nutzbar sind.'}
@@ -233,7 +234,7 @@ export default function SankeyDiagram({
               <div className="mt-3 font-[var(--font-serif)] text-[2.4rem] leading-none text-[#991b1b]">
                 {formatCHF(totalLost)}
               </div>
-              <p className="mt-3 text-sm leading-6 text-[#991b1b]/80">
+              <p className="mt-3 text-sm leading-6" style={{ color: 'rgba(153,27,27,0.8)' }}>
                 {lang === 'fr'
                   ? 'Éléments absents ou incomplets qui génèrent recherche, ressaisie et tickets évitables.'
                   : 'Fehlende oder unvollständige Übergaben, die Suche, Nacharbeit und vermeidbare Tickets erzeugen.'}
@@ -241,7 +242,7 @@ export default function SankeyDiagram({
             </div>
           </div>
 
-          <div className="rounded-[24px] border border-[var(--color-border)] bg-white px-5 py-4">
+          <div className="rounded-[24px] border border-[var(--color-border)] px-5 py-4" style={{ backgroundColor: '#ffffff' }}>
             <p className="text-sm leading-7 text-[var(--color-text-secondary)]">
               {t('reportNote', lang)}
             </p>
