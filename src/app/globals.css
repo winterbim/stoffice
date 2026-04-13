@@ -1,0 +1,71 @@
+@import "tailwindcss";
+
+@theme inline {
+  /* Core palette — deep charcoal/navy (from legacy Stoffice design) */
+  --color-bg-0: #0b0f19;
+  --color-bg-1: #0f1420;
+  --color-bg-2: #151b28;
+  --color-bg-3: #1c2436;
+  --color-bg-4: #253044;
+
+  /* Glass surfaces */
+  --color-glass: rgba(15, 20, 32, 0.72);
+  --color-glass-border: rgba(255, 255, 255, 0.06);
+
+  /* Text */
+  --color-text-0: #f0f4f8;
+  --color-text-1: #c9d1d9;
+  --color-text-2: #8b949e;
+  --color-text-3: #56616c;
+
+  /* Accent — teal/emerald */
+  --color-accent: #00d4aa;
+  --color-accent-dim: #00b392;
+  --color-accent-glow: rgba(0, 212, 170, 0.18);
+
+  /* Semantic */
+  --color-success: #34d399;
+  --color-warning: #fbbf24;
+  --color-danger: #f87171;
+  --color-info: #60a5fa;
+
+  /* Warm accents */
+  --color-gold: #d4a843;
+  --color-coral: #e8735a;
+  --color-plum: #a87ad4;
+
+  /* Fonts */
+  --font-serif: 'DM Serif Display', Georgia, serif;
+  --font-sans: 'Inter', -apple-system, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--color-bg-1); }
+::-webkit-scrollbar-thumb {
+  background: var(--color-bg-4);
+  border-radius: 999px;
+  border: 2px solid var(--color-bg-1);
+}
+
+::selection {
+  background: var(--color-accent);
+  color: var(--color-bg-0);
+}
+
+body {
+  background: var(--color-bg-0);
+  color: var(--color-text-1);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

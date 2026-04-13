@@ -9,10 +9,17 @@
  */
 
 module.exports = async function handler(req, res) {
-    // CORS headers
-    res.setHeader('Access-Control-Allow-Origin', '*');
+    // CORS headers — restricted to production domain
+    const allowedOrigins = [
+        'https://stoffice.vercel.app',
+        'http://localhost:3000',
+    ];
+    const origin = req.headers.origin;
+    if (allowedOrigins.includes(origin)) {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+    }
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
     if (req.method === 'OPTIONS') {
         return res.status(200).end();
@@ -84,9 +91,9 @@ module.exports = async function handler(req, res) {
             });
         }
     } catch (err) {
+        console.error('[dalux-proxy] Upstream error:', err.message);
         return res.status(502).json({
-            error: 'Failed to reach Dalux API',
-            details: err.message
+            error: 'Failed to reach Dalux API. Please try again later.'
         });
     }
 };

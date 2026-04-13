@@ -1,0 +1,51 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id             String   @id @default(cuid())
+  email          String   @unique
+  name           String?
+  hashedPassword String
+  role           Role     @default(USER)
+  tenantId       String
+  tenant         Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([tenantId])
+}
+
+model Tenant {
+  id           String       @id @default(cuid())
+  name         String
+  slug         String       @unique
+  daluxConfig  DaluxConfig?
+  users        User[]
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+}
+
+model DaluxConfig {
+  id           String  @id @default(cuid())
+  tenantId     String  @unique
+  tenant       Tenant  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  fmApiKey     String? // encrypted at application level
+  fmBaseUrl    String  @default("https://fm-api.dalux.com/api")
+  buildApiKey  String? // encrypted at application level
+  buildBaseUrl String  @default("https://node2.field.dalux.com/service/api")
+  fmConnected  Boolean @default(false)
+  buildConnected Boolean @default(false)
+  updatedAt    DateTime @updatedAt
+}
+
+enum Role {
+  ADMIN
+  USER
+  VIEWER
+}

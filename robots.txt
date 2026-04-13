@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://stoffice.vercel.app/sitemap.xml
