@@ -31,6 +31,9 @@ export default function ReportCanvas({
   ].filter(Boolean) as string[];
 
   const hasExtended = !!(context.contactEmail || context.contactPhone || context.sites || context.painPoints?.length);
+  const hasLegal = !!(context.registrationId || context.vatId || context.legalForm);
+  const hasFinancial = !!(context.iban || context.paymentTerms || context.creditLimit);
+  const hasMetadata = !!(context.metadata && Object.keys(context.metadata).length > 0);
 
   return (
     <div className="w-[1120px] min-h-[792px] bg-white text-[var(--color-text)]">
@@ -89,8 +92,20 @@ export default function ReportCanvas({
             {context.contactPhone && (
               <MetaCard label={t('intakePhone', lang)} value={context.contactPhone} />
             )}
+            {context.contactFunction && (
+              <MetaCard label={t('intakeFunction', lang)} value={context.contactFunction} />
+            )}
             {context.address && (
               <MetaCard label={t('intakeAddress', lang)} value={context.address} />
+            )}
+            {context.tradeName && (
+              <MetaCard label={t('intakeTradeName', lang)} value={context.tradeName} />
+            )}
+            {context.website && (
+              <MetaCard label={t('intakeWebsite', lang)} value={context.website} />
+            )}
+            {context.contactMobile && (
+              <MetaCard label={t('intakeMobile', lang)} value={context.contactMobile} />
             )}
             {context.sites && (
               <MetaCard label={t('intakeSites', lang)} value={context.sites} />
@@ -122,7 +137,31 @@ export default function ReportCanvas({
           </div>
         </section>
 
-        {/* ── Pain points (if any) ── */}
+        {/* ── Legal & Financial (if any) ── */}
+        {(hasLegal || hasFinancial) && (
+          <section className="grid gap-3 border-b border-[var(--color-border)] py-6 md:grid-cols-2 lg:grid-cols-3">
+            {context.legalForm && (
+              <InfoCard label={t('intakeLegalForm', lang)} value={context.legalForm} />
+            )}
+            {context.registrationId && (
+              <InfoCard label={t('intakeRegistrationId', lang)} value={context.registrationId} />
+            )}
+            {context.vatId && (
+              <InfoCard label={t('intakeVatId', lang)} value={context.vatId} />
+            )}
+            {context.iban && (
+              <InfoCard label="IBAN" value={context.iban} />
+            )}
+            {context.paymentTerms && (
+              <InfoCard label={t('intakePaymentTerms', lang)} value={context.paymentTerms} />
+            )}
+            {context.creditLimit && (
+              <InfoCard label={t('intakeCreditLimit', lang)} value={context.creditLimit} />
+            )}
+          </section>
+        )}
+
+        {/* ── Pain points + building/asset types ── */}
         {hasExtended && context.painPoints && context.painPoints.length > 0 && (
           <section className="border-b border-[var(--color-border)] py-6">
             <div className="grid gap-5 lg:grid-cols-[0.4fr_0.6fr]">
@@ -148,6 +187,32 @@ export default function ReportCanvas({
                 )}
               </div>
             </div>
+          </section>
+        )}
+
+        {/* ── Metadata overflow ── */}
+        {hasMetadata && context.metadata && (
+          <section className="border-b border-[var(--color-border)] py-6">
+            <div className="text-[10px] font-medium uppercase tracking-[0.18em] text-[var(--color-text-tertiary)] mb-3">
+              {t('intakeSectionMetadata', lang)}
+            </div>
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
+              {Object.entries(context.metadata).map(([key, val]) => (
+                <InfoCard key={key} label={key} value={val} />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* ── Notes ── */}
+        {context.notes && (
+          <section className="border-b border-[var(--color-border)] py-6">
+            <div className="text-[10px] font-medium uppercase tracking-[0.18em] text-[var(--color-text-tertiary)] mb-2">
+              {t('intakeNotes', lang)}
+            </div>
+            <p className="text-[13px] leading-6 text-[var(--color-text-secondary)] whitespace-pre-line">
+              {context.notes}
+            </p>
           </section>
         )}
 

@@ -20,18 +20,36 @@ export interface ReportContext {
   projectManager: string;
   logoBase64: string | null;
   date: string;
-  /* extended client data */
+  /* Identity */
+  tradeName?: string;
+  legalForm?: string;
+  registrationId?: string;
+  vatId?: string;
+  /* Contact */
+  contactFunction?: string;
   contactEmail?: string;
   contactPhone?: string;
+  contactMobile?: string;
+  website?: string;
+  /* Address */
   address?: string;
+  /* Financial */
+  iban?: string;
+  bic?: string;
+  paymentTerms?: string;
+  creditLimit?: string;
+  /* Portfolio */
   sites?: string;
   buildingTypes?: string;
   assetTypes?: string;
+  /* Pain & project */
   painPoints?: string[];
   projectScope?: string;
   budget?: string;
   timeline?: string;
   notes?: string;
+  /* Overflow */
+  metadata?: Record<string, string>;
 }
 
 /* ── Image helpers ──────────────────────────────────────────────────── */
@@ -141,12 +159,52 @@ function ConfidenceBadge({ value, lang }: { value: number; lang: Locale }) {
   );
 }
 
+/** Section wrapper with accent heading */
+function FormSection({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-elevated)] p-4 space-y-4">
+      <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-accent)]">
+        {title}
+      </div>
+      {children}
+    </div>
+  );
+}
+
+/** Metadata pills — show overflow fields in compact format */
+function MetadataPills({ metadata, onRemove }: { metadata: Record<string, string>; onRemove: (key: string) => void }) {
+  const entries = Object.entries(metadata);
+  if (entries.length === 0) return null;
+  return (
+    <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-elevated)] p-4 space-y-3">
+      <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-accent)]">
+        {/* Extra metadata */}
+        Données complémentaires
+      </div>
+      <div className="flex flex-wrap gap-2">
+        {entries.map(([key, val]) => (
+          <div key={key} className="group flex items-center gap-1.5 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg)] px-2.5 py-1.5 text-[11px]">
+            <span className="font-medium text-[var(--color-text-tertiary)]">{key}:</span>
+            <span className="text-[var(--color-text)]">{val}</span>
+            <button
+              type="button"
+              onClick={() => onRemove(key)}
+              className="ml-1 text-[var(--color-text-tertiary)] hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
+            >
+              ×
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 /* ── Main component ─────────────────────────────────────────────────── */
 
 type Phase = 'input' | 'structured';
 
 export default function ReportDrawer({ open, onClose, onGenerate, lang, generating, errorMessage }: ReportDrawerProps) {
-  /* --- state --- */
   const [phase, setPhase] = useState<Phase>('input');
   const [rawText, setRawText] = useState('');
   const [data, setData] = useState<StructuredClientData>(emptyClientData());
@@ -156,7 +214,6 @@ export default function ReportDrawer({ open, onClose, onGenerate, lang, generati
   const [structuring, setStructuring] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  /* --- handlers --- */
   const handleFile = useCallback(async (file: File) => {
     if (!file.type.startsWith('image/')) return;
     try {
@@ -178,7 +235,6 @@ export default function ReportDrawer({ open, onClose, onGenerate, lang, generati
   const handleStructure = useCallback(() => {
     if (!rawText.trim()) return;
     setStructuring(true);
-    // Simulate a brief processing delay for UX feel, then parse
     setTimeout(() => {
       const result = structureClientData(rawText);
       setData(result);
@@ -200,16 +256,36 @@ export default function ReportDrawer({ open, onClose, onGenerate, lang, generati
     setData((prev) => ({ ...prev, [key]: value }));
   }, []);
 
+  const removeMetadata = useCallback((key: string) => {
+    setData((prev) => {
+      const next = { ...prev.metadata };
+      delete next[key];
+      return { ...prev, metadata: next };
+    });
+  }, []);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const meta = Object.keys(data.metadata).length > 0 ? data.metadata : undefined;
     onGenerate({
       companyName: data.companyName,
       projectManager: data.contactPerson,
       logoBase64,
       date,
+      tradeName: data.tradeName || undefined,
+      legalForm: data.legalForm || undefined,
+      registrationId: data.registrationId || undefined,
+      vatId: data.vatId || undefined,
+      contactFunction: data.contactFunction || undefined,
       contactEmail: data.contactEmail || undefined,
       contactPhone: data.contactPhone || undefined,
+      contactMobile: data.contactMobile || undefined,
+      website: data.website || undefined,
       address: data.address || undefined,
+      iban: data.iban || undefined,
+      bic: data.bic || undefined,
+      paymentTerms: data.paymentTerms || undefined,
+      creditLimit: data.creditLimit || undefined,
       sites: data.sites || undefined,
       buildingTypes: data.buildingTypes || undefined,
       assetTypes: data.assetTypes || undefined,
@@ -218,10 +294,19 @@ export default function ReportDrawer({ open, onClose, onGenerate, lang, generati
       budget: data.budget || undefined,
       timeline: data.timeline || undefined,
       notes: data.notes || undefined,
+      metadata: meta,
     });
   };
 
   if (!open) return null;
+
+  /* Count filled fields for stats badge */
+  const filledCount = [
+    data.companyName, data.tradeName, data.legalForm, data.registrationId, data.vatId,
+    data.contactPerson, data.contactFunction, data.contactEmail, data.contactPhone, data.contactMobile, data.website,
+    data.address, data.iban, data.bic, data.paymentTerms, data.creditLimit,
+    data.sites, data.buildingTypes, data.assetTypes, data.projectScope, data.budget, data.timeline, data.notes,
+  ].filter(v => v && v.trim()).length + data.painPoints.length + Object.keys(data.metadata).length;
 
   return (
     <>
@@ -277,7 +362,6 @@ export default function ReportDrawer({ open, onClose, onGenerate, lang, generati
                   placeholder={t('intakePlaceholder', lang)}
                   rows={14}
                   className="w-full px-4 py-3.5 rounded-xl bg-[var(--color-bg-input)] border border-[var(--color-border)] text-[var(--color-text)] text-sm outline-none focus:border-[var(--color-accent)] focus:ring-2 focus:ring-[var(--color-accent-light)] transition-all resize-y leading-relaxed font-mono"
-                  onPaste={() => {/* allow paste, no special handling needed */}}
                 />
                 <p className="mt-1.5 text-[11px] text-[var(--color-text-tertiary)] leading-relaxed">
                   {t('intakeHint', lang)}
@@ -325,11 +409,18 @@ export default function ReportDrawer({ open, onClose, onGenerate, lang, generati
           {/* ═══════ PHASE 2: Structured form ═══════ */}
           {phase === 'structured' && (
             <form onSubmit={handleSubmit} className="space-y-5">
-              {/* Confidence badge + back link */}
-              <div className="flex items-center justify-between gap-3">
-                {data.confidence > 0 && (
-                  <ConfidenceBadge value={data.confidence} lang={lang} />
-                )}
+              {/* Confidence badge + stats + back */}
+              <div className="flex items-center justify-between gap-3 flex-wrap">
+                <div className="flex items-center gap-2">
+                  {data.confidence > 0 && (
+                    <ConfidenceBadge value={data.confidence} lang={lang} />
+                  )}
+                  {filledCount > 0 && (
+                    <span className="inline-flex items-center rounded-full bg-[var(--color-bg-elevated)] border border-[var(--color-border)] px-2.5 py-0.5 text-[10px] font-medium text-[var(--color-text-secondary)]">
+                      {filledCount} {t('intakeFieldsDetected', lang)}
+                    </span>
+                  )}
+                </div>
                 <button
                   type="button"
                   onClick={handleBackToInput}
@@ -348,35 +439,70 @@ export default function ReportDrawer({ open, onClose, onGenerate, lang, generati
                 </p>
               )}
 
-              {/* ── Section: Client ── */}
-              <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-elevated)] p-4 space-y-4">
-                <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-accent)]">
-                  {t('intakeSectionClient', lang)}
-                </div>
+              {/* ── Section: Client & Contact ── */}
+              <FormSection title={t('intakeSectionClient', lang)}>
                 <FieldInput id="companyName" label={t('companyLabel', lang)} value={data.companyName} onChange={(v) => updateField('companyName', v)} placeholder={t('companyPlaceholder', lang)} required />
+                {(data.tradeName || data.legalForm) && (
+                  <div className="grid grid-cols-2 gap-3">
+                    <FieldInput id="tradeName" label={t('intakeTradeName', lang)} value={data.tradeName} onChange={(v) => updateField('tradeName', v)} placeholder="Nom commercial" />
+                    <FieldInput id="legalForm" label={t('intakeLegalForm', lang)} value={data.legalForm} onChange={(v) => updateField('legalForm', v)} placeholder="SARL, SA, GmbH…" />
+                  </div>
+                )}
                 <FieldInput id="contactPerson" label={t('intakeContactPerson', lang)} value={data.contactPerson} onChange={(v) => updateField('contactPerson', v)} placeholder={t('managerPlaceholder', lang)} required />
+                {data.contactFunction && (
+                  <FieldInput id="contactFunction" label={t('intakeFunction', lang)} value={data.contactFunction} onChange={(v) => updateField('contactFunction', v)} placeholder="Directeur technique, Gérant…" />
+                )}
                 <div className="grid grid-cols-2 gap-3">
                   <FieldInput id="contactEmail" label={t('intakeEmail', lang)} value={data.contactEmail} onChange={(v) => updateField('contactEmail', v)} type="email" placeholder="email@example.com" />
                   <FieldInput id="contactPhone" label={t('intakePhone', lang)} value={data.contactPhone} onChange={(v) => updateField('contactPhone', v)} type="tel" placeholder="+41 …" />
                 </div>
+                {data.contactMobile && (
+                  <div className="grid grid-cols-2 gap-3">
+                    <FieldInput id="contactMobile" label={t('intakeMobile', lang)} value={data.contactMobile} onChange={(v) => updateField('contactMobile', v)} type="tel" placeholder="+41 79 …" />
+                    <FieldInput id="website" label={t('intakeWebsite', lang)} value={data.website} onChange={(v) => updateField('website', v)} placeholder="www.example.com" />
+                  </div>
+                )}
+                {!data.contactMobile && data.website && (
+                  <FieldInput id="website" label={t('intakeWebsite', lang)} value={data.website} onChange={(v) => updateField('website', v)} placeholder="www.example.com" />
+                )}
                 <FieldInput id="address" label={t('intakeAddress', lang)} value={data.address} onChange={(v) => updateField('address', v)} placeholder="Strasse Nr, PLZ Ort" />
-              </div>
+              </FormSection>
+
+              {/* ── Section: Legal IDs (show only if any data) ── */}
+              {(data.registrationId || data.vatId) && (
+                <FormSection title={t('intakeSectionLegal', lang)}>
+                  <FieldInput id="registrationId" label={t('intakeRegistrationId', lang)} value={data.registrationId} onChange={(v) => updateField('registrationId', v)} placeholder="SIRET / IDE / HR-Nr" />
+                  <FieldInput id="vatId" label={t('intakeVatId', lang)} value={data.vatId} onChange={(v) => updateField('vatId', v)} placeholder="TVA / USt-IdNr / MwSt" />
+                </FormSection>
+              )}
+
+              {/* ── Section: Financial (show only if any data) ── */}
+              {(data.iban || data.bic || data.paymentTerms || data.creditLimit) && (
+                <FormSection title={t('intakeSectionFinancial', lang)}>
+                  {data.iban && (
+                    <FieldInput id="iban" label="IBAN" value={data.iban} onChange={(v) => updateField('iban', v)} />
+                  )}
+                  {data.bic && (
+                    <FieldInput id="bic" label="BIC / SWIFT" value={data.bic} onChange={(v) => updateField('bic', v)} />
+                  )}
+                  {(data.paymentTerms || data.creditLimit) && (
+                    <div className="grid grid-cols-2 gap-3">
+                      <FieldInput id="paymentTerms" label={t('intakePaymentTerms', lang)} value={data.paymentTerms} onChange={(v) => updateField('paymentTerms', v)} placeholder="30 jours fin de mois" />
+                      <FieldInput id="creditLimit" label={t('intakeCreditLimit', lang)} value={data.creditLimit} onChange={(v) => updateField('creditLimit', v)} placeholder="15 000 €" />
+                    </div>
+                  )}
+                </FormSection>
+              )}
 
               {/* ── Section: Portfolio ── */}
-              <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-elevated)] p-4 space-y-4">
-                <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-accent)]">
-                  {t('intakeSectionPortfolio', lang)}
-                </div>
+              <FormSection title={t('intakeSectionPortfolio', lang)}>
                 <FieldInput id="sites" label={t('intakeSites', lang)} value={data.sites} onChange={(v) => updateField('sites', v)} placeholder={t('intakeSitesPlaceholder', lang)} />
                 <FieldInput id="buildingTypes" label={t('intakeBuildingTypes', lang)} value={data.buildingTypes} onChange={(v) => updateField('buildingTypes', v)} placeholder={t('intakeBuildingTypesPlaceholder', lang)} />
                 <FieldInput id="assetTypes" label={t('intakeAssetTypes', lang)} value={data.assetTypes} onChange={(v) => updateField('assetTypes', v)} placeholder={t('intakeAssetTypesPlaceholder', lang)} />
-              </div>
+              </FormSection>
 
               {/* ── Section: Pain points ── */}
-              <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-elevated)] p-4 space-y-4">
-                <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-accent)]">
-                  {t('intakeSectionPains', lang)}
-                </div>
+              <FormSection title={t('intakeSectionPains', lang)}>
                 <FieldTextarea
                   id="painPoints"
                   label={t('intakePainPoints', lang)}
@@ -385,26 +511,23 @@ export default function ReportDrawer({ open, onClose, onGenerate, lang, generati
                   placeholder={t('intakePainPointsHint', lang)}
                   rows={4}
                 />
-              </div>
+              </FormSection>
 
               {/* ── Section: Project ── */}
-              <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-elevated)] p-4 space-y-4">
-                <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-accent)]">
-                  {t('intakeSectionProject', lang)}
-                </div>
+              <FormSection title={t('intakeSectionProject', lang)}>
                 <FieldInput id="scope" label={t('intakeScope', lang)} value={data.projectScope} onChange={(v) => updateField('projectScope', v)} placeholder={t('intakeScopePlaceholder', lang)} />
                 <div className="grid grid-cols-2 gap-3">
                   <FieldInput id="budget" label={t('intakeBudget', lang)} value={data.budget} onChange={(v) => updateField('budget', v)} placeholder="~200k CHF" />
                   <FieldInput id="timeline" label={t('intakeTimeline', lang)} value={data.timeline} onChange={(v) => updateField('timeline', v)} placeholder="Q1 2026" />
                 </div>
                 <FieldTextarea id="notes" label={t('intakeNotes', lang)} value={data.notes} onChange={(v) => updateField('notes', v)} placeholder={t('intakeNotesPlaceholder', lang)} rows={2} />
-              </div>
+              </FormSection>
+
+              {/* ── Metadata overflow ── */}
+              <MetadataPills metadata={data.metadata} onRemove={removeMetadata} />
 
               {/* ── Logo upload ── */}
-              <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-elevated)] p-4 space-y-3">
-                <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-accent)]">
-                  {t('logoLabel', lang)}
-                </div>
+              <FormSection title={t('logoLabel', lang)}>
                 <div
                   onClick={() => fileRef.current?.click()}
                   onDragOver={(e) => e.preventDefault()}
@@ -437,7 +560,7 @@ export default function ReportDrawer({ open, onClose, onGenerate, lang, generati
                     {t('logoRemove', lang)}
                   </button>
                 )}
-              </div>
+              </FormSection>
 
               {/* ── Date ── */}
               <FieldInput id="date" label={t('dateLabel', lang)} value={date} onChange={setDate} type="date" />
