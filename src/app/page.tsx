@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Header from '@/components/Header';
+import ImpactRadar from '@/components/ImpactRadar';
 import Calculator from '@/components/Calculator';
 import { t, type Locale } from '@/lib/i18n';
 
@@ -39,6 +40,9 @@ export default function Home() {
             {t('subtitle', lang)}
           </p>
         </div>
+
+        {/* ImpactRadar — Handover → FM */}
+        <ImpactRadar lang={lang} />
 
         {/* Calculator */}
         <Calculator lang={lang} />
