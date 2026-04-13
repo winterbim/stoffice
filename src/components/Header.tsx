@@ -20,22 +20,22 @@ export default function Header({ lang, onLangChange }: Readonly<HeaderProps>) {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <header className="fixed top-0 w-full z-50 bg-[var(--color-bg)]/90 backdrop-blur-md border-b border-[var(--color-border)]">
+    <header className="fixed top-0 w-full z-50 bg-[var(--color-bg)]/80 backdrop-blur-xl border-b border-[var(--color-border)]">
       <div className="max-w-[1200px] mx-auto px-6 flex justify-between items-center h-16">
         {/* Logo */}
         <Link href="/" className="no-underline">
-          <span className="font-[var(--font-serif)] text-xl text-[var(--color-text)] tracking-tight">
+          <span className="font-[var(--font-serif)] text-xl text-[var(--color-accent)] tracking-tight">
             Stoffice
           </span>
         </Link>
 
         {/* Desktop nav */}
-        <nav className="hidden md:flex items-center gap-6">
+        <nav className="hidden md:flex items-center gap-7">
           {NAV_LINKS.map(({ key, href }) => (
             <a
               key={key}
               href={href}
-              className="text-[13px] text-[var(--color-text-secondary)] no-underline hover:text-[var(--color-text)] transition-colors"
+              className="text-[12px] uppercase tracking-[0.14em] text-[var(--color-text-tertiary)] no-underline hover:text-[var(--color-accent)] transition-colors duration-300"
             >
               {t(key, lang)}
             </a>
@@ -51,9 +51,9 @@ export default function Header({ lang, onLangChange }: Readonly<HeaderProps>) {
                 key={l}
                 onClick={() => onLangChange(l)}
                 aria-label={l === 'de' ? 'Deutsch' : 'Français'}
-                className={`px-2 py-1 rounded bg-transparent border-0 cursor-pointer transition-colors ${
+                className={`px-2 py-1 rounded bg-transparent border-0 cursor-pointer transition-colors duration-300 ${
                   lang === l
-                    ? 'text-[var(--color-text)] font-medium'
+                    ? 'text-[var(--color-accent)] font-medium'
                     : 'text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]'
                 }`}
               >
@@ -65,7 +65,7 @@ export default function Header({ lang, onLangChange }: Readonly<HeaderProps>) {
           {/* CTA — desktop */}
           <a
             href="mailto:info@stoffice.ch?subject=Demo"
-            className="hidden md:inline-flex items-center px-5 py-2 bg-[var(--color-accent)] text-white text-[13px] font-semibold rounded-lg no-underline hover:bg-[var(--color-accent-hover)] transition-colors"
+            className="hidden md:inline-flex items-center px-5 py-2 border border-[var(--color-accent)]/40 text-[var(--color-accent)] text-[12px] font-medium tracking-wide rounded-full no-underline hover:bg-[var(--color-accent)] hover:text-[var(--color-bg)] transition-all duration-300"
           >
             {t('navDemo', lang)}
           </a>

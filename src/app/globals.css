@@ -1,20 +1,25 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-bg: #ffffff;
-  --color-bg-elevated: #f7f8fa;
-  --color-bg-input: #f0f2f5;
+  /* ── Dark, warm, moody palette — inspired by monochrome desk photography ── */
+  --color-bg: #0e0e12;
+  --color-bg-elevated: #16161c;
+  --color-bg-input: #1e1e26;
+  --color-bg-warm: #1a1914;
 
-  --color-text: #1a2b3c;
-  --color-text-secondary: #5a6b7b;
-  --color-text-tertiary: #94a3b3;
+  --color-text: #e8e4de;
+  --color-text-secondary: #9e978e;
+  --color-text-tertiary: #6b665e;
 
-  --color-accent: #0b6fcb;
-  --color-accent-hover: #0a5da8;
-  --color-accent-light: rgba(11, 111, 203, 0.06);
+  --color-accent: #c8a97a;
+  --color-accent-hover: #dbbf92;
+  --color-accent-light: rgba(200, 169, 122, 0.07);
 
-  --color-border: #e8ecf0;
-  --color-border-strong: #d0d7de;
+  --color-border: #222228;
+  --color-border-strong: #33333c;
+
+  --color-surface-glass: rgba(255, 255, 255, 0.03);
+  --color-glow: rgba(200, 169, 122, 0.08);
 
   --font-serif: 'DM Serif Display', Georgia, serif;
   --font-sans: 'Inter', -apple-system, system-ui, sans-serif;
@@ -23,7 +28,7 @@
 
 ::selection {
   background: var(--color-accent);
-  color: #ffffff;
+  color: #0e0e12;
 }
 
 body {
@@ -33,9 +38,34 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* ── Subtle film-grain overlay for analog texture ── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 256px 256px;
+}
+
+/* ── Smooth scrolling ── */
+html {
+  scroll-behavior: smooth;
+}
+
 @media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* ── Sensual horizontal rule ── */
+.divider-glow {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--color-accent) 30%, var(--color-accent) 70%, transparent);
+  opacity: 0.15;
 }
