@@ -149,10 +149,11 @@ export default function Calculator({ lang }: CalculatorProps) {
         const { default: html2canvas } = await import('html2canvas');
         const canvas = await html2canvas(exportCaptureRef.current, {
           backgroundColor: '#ffffff',
-          scale: 2.5,
+          scale: 3,
           logging: false,
           useCORS: true,
           imageTimeout: 0,
+          windowWidth: 794,
         });
         reportDataUrl = canvas.toDataURL('image/png');
       }
@@ -312,7 +313,7 @@ export default function Calculator({ lang }: CalculatorProps) {
         <div
           ref={exportCaptureRef}
           aria-hidden="true"
-          className="fixed left-[-300vw] top-0 bg-white"
+          style={{ position: 'fixed', left: '-9999px', top: 0, backgroundColor: '#ffffff' }}
         >
           <ReportCanvas
             lang={lang}
