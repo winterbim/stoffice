@@ -36,7 +36,7 @@ export default function ReportCanvas({
   const hasMetadata = !!(context.metadata && Object.keys(context.metadata).length > 0);
 
   return (
-    <div className="w-[1120px] min-h-[792px] bg-white text-[var(--color-text)]">
+    <div className="w-[1120px] min-h-[792px] text-[var(--color-text)]" style={{ backgroundColor: '#ffffff' }}>
       <div className="flex min-h-[792px] flex-col p-10">
         {/* ── Header ── */}
         <header className="flex items-start justify-between border-b border-[var(--color-border)] pb-7">
@@ -69,9 +69,9 @@ export default function ReportCanvas({
               )}
             </div>
 
-            <div className="w-full rounded-[20px] bg-[var(--color-accent)] px-5 py-4 text-white">
+            <div className="w-full rounded-[20px] bg-[var(--color-accent)] px-5 py-4" style={{ color: '#ffffff' }}>
               <div className="font-[var(--font-serif)] text-[1.5rem] leading-none">Stoffice</div>
-              <div className="mt-1.5 text-[10px] uppercase tracking-[0.2em] text-white/80">Smart Building AI</div>
+              <div className="mt-1.5 text-[10px] uppercase tracking-[0.2em]" style={{ color: 'rgba(255,255,255,0.8)' }}>Smart Building AI</div>
             </div>
           </div>
         </header>
@@ -123,7 +123,7 @@ export default function ReportCanvas({
             </div>
 
             {context.projectScope && (
-              <div className="rounded-[20px] border border-[var(--color-border)] bg-white p-5">
+              <div className="rounded-[20px] border border-[var(--color-border)] p-5" style={{ backgroundColor: '#ffffff' }}>
                 <div className="text-[10px] font-medium uppercase tracking-[0.18em] text-[var(--color-text-tertiary)]">
                   {t('intakeScope', lang)}
                 </div>
@@ -172,7 +172,7 @@ export default function ReportCanvas({
                 <ul className="space-y-1.5">
                   {context.painPoints.map((point, i) => (
                     <li key={i} className="flex items-start gap-2 text-[13px] leading-6 text-[var(--color-text-secondary)]">
-                      <span className="mt-2 h-1.5 w-1.5 rounded-full bg-red-400 shrink-0" />
+                      <span className="mt-2 h-1.5 w-1.5 rounded-full shrink-0" style={{ backgroundColor: '#f87171' }} />
                       {point}
                     </li>
                   ))}
@@ -248,7 +248,7 @@ export default function ReportCanvas({
 
 function MetaCard({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-[18px] border border-[var(--color-border)] bg-white p-4">
+    <div className="rounded-[18px] border border-[var(--color-border)] p-4" style={{ backgroundColor: '#ffffff' }}>
       <div className="text-[10px] font-medium uppercase tracking-[0.16em] text-[var(--color-text-tertiary)]">
         {label}
       </div>
@@ -282,11 +282,20 @@ function KpiCard({
   accent?: boolean;
 }) {
   return (
-    <div className={`rounded-[20px] border p-4 ${accent ? 'border-transparent bg-[var(--color-accent)] text-white' : 'border-[var(--color-border)] bg-[var(--color-bg-elevated)] text-[var(--color-text)]'}`}>
-      <div className={`text-[10px] font-medium uppercase tracking-[0.16em] ${accent ? 'text-white/80' : 'text-[var(--color-text-tertiary)]'}`}>
+    <div
+      className={`rounded-[20px] border p-4 ${accent ? 'border-transparent bg-[var(--color-accent)]' : 'border-[var(--color-border)] bg-[var(--color-bg-elevated)] text-[var(--color-text)]'}`}
+      style={accent ? { color: '#ffffff' } : undefined}
+    >
+      <div
+        className={`text-[10px] font-medium uppercase tracking-[0.16em] ${accent ? '' : 'text-[var(--color-text-tertiary)]'}`}
+        style={accent ? { color: 'rgba(255,255,255,0.8)' } : undefined}
+      >
         {label}
       </div>
-      <div className={`mt-3 font-[var(--font-serif)] text-[2rem] leading-none ${accent ? 'text-white' : 'text-[var(--color-text)]'}`}>
+      <div
+        className={`mt-3 font-[var(--font-serif)] text-[2rem] leading-none ${accent ? '' : 'text-[var(--color-text)]'}`}
+        style={accent ? { color: '#ffffff' } : undefined}
+      >
         {value}
       </div>
     </div>
