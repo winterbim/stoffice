@@ -10,8 +10,8 @@ interface PdfParams {
 
 /**
  * A4 portrait: 210 × 297 mm
- * Canvas is 794 × N px (2 pages of ~1123px each)
- * We slice the image into pages.
+ * Canvas is 794 × N px (3 pages of 1123 px each = 3369 px total).
+ * We slice the captured image into per-page chunks.
  */
 const A4W = 210;
 const PAGE_PX = 1123;
